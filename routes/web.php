@@ -9,8 +9,10 @@ use App\Http\Controllers\InventoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\BulkUploadController;
 
-// Route::get('/', [DashboardController::class,'index'])->name('dashboard');
+
+Route::get('/', [DashboardController::class,'index'])->name('index');
 Route::get('/dashboard', [DashboardController::class,'index'])->name('dashboard');
 
 Route::resources([
@@ -41,6 +43,8 @@ Route::get('/invoice/generate',[InvoiceController::class,'index'])->name('invoic
 Route::get('/invoice/list',[InvoiceController::class,'list'])->name('invoiceList');
 Route::post('/invoice/create',[InvoiceController::class,'create'])->name('newInvoiceCreate');
 Route::post('/invoice/loadpdf',[InvoiceController::class,'loadpdf'])->name('loadPdf');
+Route::get('/searchInvoice',[InvoiceController::class,'searchInvoice'])->name('invoice.search');
+
 
 Route::get('/searchCustomer',[CustomerController::class,'searchCustomer'])->name('customer.search');
 
@@ -49,3 +53,17 @@ Route::get('/download-zip/{file}', [InvoiceController::class, 'downloadZip'])->n
 
 Route::post('/shipment/create',[ShipmentController::class, 'createShipment'])->name('createShipment');
 Route::get('/shipment/list',[ShipmentController::class, 'shipmentList'])->name('shipmentList');
+
+Route::get('/payments/list',[CustomerController::class, 'paymentsList'])->name('paymentsList');
+Route::post('/paymentsUpdate/{id}',[CustomerController::class, 'paymentsUpdate'])->name('paymentsUpdate');
+
+Route::post('/uploadCustomerCsv',[BulkUploadController::class,'uploadCustomerCsv'])->name('customer.upload');
+Route::post('/uploadProductCsv',[BulkUploadController::class,'uploadProductCsv'])->name('product.upload');
+
+Route::get('/generateProductCsv', [BulkUploadController::class, 'generateProductCsv'])->name('generate.product.csv');
+Route::get('/downloadProductCsv/{file}', [BulkUploadController::class, 'downloadProductCsv'])->name('download.product.csv');
+
+Route::get('/generateCustomerCsv', [BulkUploadController::class, 'generateCustomerCsv'])->name('generate.customer.csv');
+Route::get('/downloadCustomerCsv/{file}',[BulkUploadController::class,'downloadCustomerCsv'])->name('download.customer.csv');
+
+Route::get('/getPaymentsByBeat/{beatId}',[CustomerController::class,'getPaymentsByBeat'])->name('getPaymentsByBeat');

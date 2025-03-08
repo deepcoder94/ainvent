@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Measurement;
 use App\Models\Product;
+use App\Models\ProductMeasurement;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -12,8 +14,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::get();
-        return view('pages.products.list', ['currentPage' => 'products', 'products' => $products]);        
+        $products = Product::with('measurements')->get();
+        $measurements = Measurement::all();
+        return view('pages.products.list', ['currentPage' => 'products', 'products' => $products,'measurements' => $measurements]);        
     }
 
     /**
@@ -36,11 +39,22 @@ class ProductController extends Controller
                 'is_active'    => 'required',
             ]);
 
-            $beat = Product::create([
+            $product = Product::create([
                 'product_name'    => $request->product_name,
                 'product_rate' => $request->product_rate,
                 'is_active'    => $request->is_active,
             ]);
+
+            $product_measurements = $request->product_measurements;
+            foreach ($product_measurements as $m){
+                ProductMeasurement::firstOrCreate([
+                    'measurement_id' => $m
+                ],[
+                    'product_id' => $product->id,
+                    'measurement_id'=>$m
+                ]);    
+            }
+
             $success = true;
             $message = 'Products saved successfully';
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Beat;
 use App\Models\Customer;
+use App\Models\CustomerPayment;
 use App\Models\Distributor;
 use App\Models\Inventory;
 use App\Models\Invoice;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use ZipArchive;
 use App\Models\InventoryHistory;
+use Carbon\Carbon;
 
 class InvoiceController extends Controller
 {
@@ -22,7 +24,7 @@ class InvoiceController extends Controller
     {
         $customers   = Customer::get();
         $beats       = Beat::get();
-        $products    = Product::get();
+        $products    = Product::with('measurements')->get();
         $measurement = Measurement::get();
 
         return view('pages.invoices.generate', ['currentPage' => 'invoicesCreate', 'beats' => $beats, 'customers' => $customers, 'products' => $products, 'measurements' => $measurement]);
@@ -37,7 +39,7 @@ class InvoiceController extends Controller
     public function loadpdf(Request $request)
     {
         $invoices = $request->input('selectedInvoices');
-
+        $currentDate = Carbon::now()->format('d-m-Y'); // Format the date as you want
         // Create a new ZIP file in storage
         $zipFileName = 'invoices.zip';
         $zipFilePath = storage_path('app/' . $zipFileName);
@@ -112,6 +114,8 @@ class InvoiceController extends Controller
                 'beat_id' => $request->input('beat_id')
             ]);
 
+            $total = 0;
+
             foreach ($products as $product) {
 
                 $measurement = Measurement::where('id',$product['measurement_id'])->get()->first();
@@ -123,10 +127,15 @@ class InvoiceController extends Controller
                     'quantity' => $product['qty'],
                     'rate' => $product['rate'],
                 ];
+
+
                 InvoiceProduct::create($data);
                 
                 $inventory = Inventory::where('product_id', $product['product_id'])->get()->first();
                 $totalDeduction = $measurement->quantity * $product['qty'];
+
+                $total += $totalDeduction * $product['rate'];
+
                 $inventory->total_stock -= $totalDeduction;
                 $inventory->save();
 
@@ -138,6 +147,11 @@ class InvoiceController extends Controller
                 ]);
 
             }
+
+            $payment = CustomerPayment::where('customer_id',$request->input('customer_id'))->get()->first();
+            $payment->invoice_total += $total;
+            $payment->save();
+
             $success = true;
             $message = 'Invoice saved successfully';
         } catch (\Exception $e) {
@@ -169,5 +183,26 @@ class InvoiceController extends Controller
             $total = collect($items)->sum('amount');
             $grandTotal = $total;            
         }
+    }
+
+    public function searchInvoice(Request $request){
+        $invId =$request->input('invId');
+        $invDate =$request->input('invDate');
+        $query = Invoice::query();
+        if(!empty($invDate)){
+            $formattedDate = Carbon::createFromFormat('m/d/Y', $invDate)->format('Y-m-d');
+            $query->whereDate('created_at',$formattedDate);
+        }
+        if(!empty($invId)){
+            $id = $invId;
+            if(str_contains($invId,'INV-') || str_contains($invId,'inv-')){
+                $id = str_replace('INV-','',$invId);
+                $id = str_replace('inv-','',$id);
+            }
+            $query->where('id',$id);
+        }
+        $records = $query->get();
+        return view('pages.invoices.single',['invoices'=>$records]);
+
     }
 }

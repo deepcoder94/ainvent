@@ -2,16 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Beat;
-use App\Models\Customer;
-use App\Models\Distributor;
 use App\Models\Inventory;
-use App\Models\InventoryHistory;
 use App\Models\Invoice;
 use App\Models\InvoiceProduct;
 
-use App\Models\Measurement;
-use App\Models\Product;
 use App\Models\Shipment;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;

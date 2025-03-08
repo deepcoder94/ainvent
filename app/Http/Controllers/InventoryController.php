@@ -44,10 +44,11 @@ class InventoryController extends Controller
                 $product = Inventory::where('product_id', $product_id)->get()->first();
                 $mea_qty = Measurement::where('id', (int)$record['inv_mea'])->first()->quantity;
                 $total_qty = (int)$record['inv_qty'] * $mea_qty;
+
                 if(!empty($product)){
                     // If product exists, increase the quantity
 
-                    
+                    $product->buying_price = $record['inv_buying_price'];
                     $product->total_stock += $total_qty;
                     $product->save();
 
@@ -55,7 +56,8 @@ class InventoryController extends Controller
                         'product_id' => (int)$product_id,
                         'measurement_id' => (int)$record['inv_mea'],
                         'stock_out_in'   => (int)$record['inv_qty'],
-                        'stock_action'  => 'add'
+                        'stock_action'  => 'add',
+                        'buying_price'  => $record['inv_buying_price']
                     ]);
 
                 }
@@ -63,7 +65,8 @@ class InventoryController extends Controller
                     $invtry = Inventory::create([
                         'item_code'=>'',
                         'product_id' => (int)$product_id,
-                        'total_stock' => $total_qty
+                        'total_stock' => $total_qty,
+                        'buying_price'  => $record['inv_buying_price']
                     ]);
                     $invtry->item_code = 'IN-'.$invtry->id;
                     $invtry->save();
@@ -72,7 +75,8 @@ class InventoryController extends Controller
                         'product_id' => (int)$product_id,
                         'measurement_id' => (int)$record['inv_mea'],
                         'stock_out_in'   => (int)$record['inv_qty'],
-                        'stock_action'  => 'add'
+                        'stock_action'  => 'add',
+                        'buying_price'  => $record['inv_buying_price']
                     ]);
 
                 }
