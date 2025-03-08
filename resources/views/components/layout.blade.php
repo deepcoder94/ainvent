@@ -27,10 +27,6 @@
         <link href="{{ asset('public/assets/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
         <link href="{{ asset('public/assets/vendor/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
         <link href="{{ asset('public/assets/vendor/boxicons/css/boxicons.min.css')}}" rel="stylesheet">
-        <link href="{{ asset('public/assets/vendor/quill/quill.snow.css')}}" rel="stylesheet">
-        <link href="{{ asset('public/assets/vendor/quill/quill.bubble.css')}}" rel="stylesheet">
-        <link href="{{ asset('public/assets/vendor/remixicon/remixicon.css')}}" rel="stylesheet">
-        <link href="{{ asset('public/assets/vendor/simple-datatables/style.css')}}" rel="stylesheet">
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
 
 <!-- SweetAlert2 CSS -->
@@ -42,7 +38,13 @@
         <!-- Template Main CSS File -->
         <link href="{{ asset('public/assets/css/style.css')}}" rel="stylesheet">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-
+        <style>
+            .tablecontainer {
+                width: 100%;
+                overflow-x: auto;
+            }        
+        </style>
+    
     </head>
     
     <body>

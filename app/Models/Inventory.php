@@ -8,7 +8,7 @@ class Inventory extends Model
 {
     protected $table = 'inventory';
 
-    protected $fillable = ["item_code","product_id","total_stock"];
+    protected $fillable = ["item_code","product_id","total_stock","buying_price"];
 
     public function product(){
         return $this->belongsTo(Product::class,'product_id');

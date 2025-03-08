@@ -1,33 +1,25 @@
 <x-layout :currentPage="$currentPage">
-    
+    <div class="mt-2 mb-2">
+        <button class="btn btn-primary" onclick="showCreateForm()">Add New</button>    
+    </div>    
     <section class="section">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-body tablecontainer">
                         <h5 class="card-title">Inventory</h5>
-                        <button class="btn btn-primary" onclick="showCreateForm()">Add New</button>
                         <!-- Table with stripped rows -->
                         <table class="table table-bordered mt-1">
                             <thead>
                                 <tr>
                                     <th>Item Code</th>
                                     <th>Product Name</th>
+                                    <th>Buying Price</th>
                                     <th>Total Stock</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($inventory as $i)
-                                <tr>
-                                    <td>{{ $i->item_code }}</td>
-                                    <td>{{ $i->product->product_name }}</td>
-                                    <td>{{ $i->total_stock }}</td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="3" class="text-center">No records</td>
-                                </tr>
-                                @endforelse
+                                @include('pages.inventory.inv_single',['inventory'=>$inventory])
                             </tbody>
                         </table>
                         <!-- End Table with stripped rows -->
@@ -36,56 +28,7 @@
             </div>
         </div>
     </section>
-    <div class="modal fade" id="inventoryModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="modal-title"></h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <!-- General Form Elements -->
-              <!-- Vertical Form -->
-              <form class="row g-3" id="inventory_form" action="#" method="post">
-                <table class="table table-bordered" id="invProds">
-                    <tr id="inv_rec_1">
-                        <td>
-                            <select name="inv_product[]" class="form-control">
-                                <option value="">Select Product..</option>
-                                @foreach ($products as $p)
-                                    <option value="{{ $p->id }}">{{ $p->product_name }}</option>
-                                @endforeach
-                            </select>
-                        </td>
-                        <td>
-                        <select name="inv_mea[]" class="form-control">
-                                <option value="">Select Type..</option>
-                                @foreach ($measurements as $p)
-                                    <option value="{{ $p->id }}">{{ $p->name }}</option>
-                                @endforeach
-                            </select>                            
-                        </td>
-                        <td>
-                            <input type="text" name="inv_qty[]" class="form-control" placeholder="Quantity">
-                        </td>
-                        <td>
-                            <i class="bi bi-plus-square-fill text-success" style="font-size: 24px;cursor:pointer" onclick="addInvProduct()"></i>
-                        </td>
-                        <td>
-                        </td>
-                    </tr>
-                </table>
-
-              </form><!-- Vertical Form -->               
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" onclick="submitInvForm()">Save changes</button>
-            </div>
-          </div>
-        </div>
-      </div><!-- End Basic Modal-->        
-
+    @include('pages.inventory.inv_modal')
       <script>
 
         var invProductCount = 1;
@@ -120,7 +63,9 @@
                         <td>
                             <input type="text" name="inv_qty[]" class="form-control" placeholder="Quantity">
                         </td>
-
+                        <td>
+                            <input type="text" name="inv_buying_price[]" class="form-control" placeholder="Buy Price">
+                        </td>
                         <td>
                             <i class="bi bi-plus-square-fill text-success" style="font-size: 24px;cursor:pointer" onclick="addInvProduct()"></i>
                         </td>
@@ -160,7 +105,8 @@
                 finalData.push({
                     inv_product: groupedValues["inv_product[]"][i],
                     inv_mea: groupedValues["inv_mea[]"][i],
-                    inv_qty: groupedValues["inv_qty[]"][i]
+                    inv_qty: groupedValues["inv_qty[]"][i],
+                    inv_buying_price: groupedValues["inv_buying_price[]"][i]
                 });
             }    
             

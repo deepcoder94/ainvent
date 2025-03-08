@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Beat;
 use App\Models\Customer;
+use App\Models\CustomerPayment;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -162,7 +163,41 @@ class CustomerController extends Controller
         }
         $cust = $query->get();
 
-        return view('partials.customers.list',['customers'=>$cust]);
+        return view('pages.customers.single',['customers'=>$cust]);
+    }
+
+    public function paymentsList(){
+        $customerpayments = CustomerPayment::with('customer')->get();
+        $beats     = Beat::get();
+        return view('pages.payments.list', ['currentPage' => 'customer_payments', 'customerpayments' => $customerpayments, 'beats' => $beats]);
+
+    }
+
+    public function paymentsUpdate(Request $request,$id){
+        try{
+            $resource = CustomerPayment::findOrFail($id);
+
+            $payment = $resource->update([
+                'total_due'    => $request->due,
+                'invoice_total'=> 0
+            ]);
+            $success = true;
+            $message = 'Customer updated successfully';
+        }
+        catch(\Exception $e){
+            $success = false;
+            $message = $e->getMessage();
+        }
+        return response()->json([
+            'success' => $success,
+            'message' => $message,
+        ]);
+
+
+    }
+
+    public function getPaymentsByBeat(Request $request,$beatId){
+        dd('123');
     }
 
 }

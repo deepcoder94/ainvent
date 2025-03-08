@@ -4,15 +4,16 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-body tablecontainer">
                         <h5 class="card-title">Inventory History</h5>
                         <!-- Table with stripped rows -->
                         <table class="table table-bordered mt-1">
                             <thead>
                                 <tr>
                                     <th>Product Name</th>
-                                    <th>Measurement</th>
-                                    <th>Total Quantity</th>
+                                    <th>Type</th>
+                                    <th>Total Qty</th>
+                                    <th>Buy Price</th>
                                     <th>Stock In / Out</th>
                                     <th>Date</th>
                                 </tr>
@@ -23,6 +24,7 @@
                                     <td>{{ $i->product->product_name }}</td>
                                     <td>{{ $i->measurement->name }}</td>
                                     <td>{{ $i->stock_out_in }}</td>
+                                    <td>{{ $i->buying_price }}</td>
                                     <td>
                                         @if($i->stock_action == 'add')
                                             <span class="badge bg-success">Added</span>                                        
