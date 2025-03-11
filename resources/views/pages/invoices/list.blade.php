@@ -61,7 +61,7 @@
                                 </tr>
                             </thead>
                             <tbody id="invoice_body">
-                                @include('pages.invoices.single',['invoices'=>$invoices])
+                                @include('pages.invoices.list-single',['invoices'=>$invoices])
                             </tbody>
                         </table>
                         <!-- End Table with stripped rows -->

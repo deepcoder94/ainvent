@@ -30,10 +30,10 @@
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
 
 <!-- SweetAlert2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<link href="{{ asset('public/assets/css/sweetalert2.min.css') }}" rel="stylesheet">
 
 <!-- SweetAlert2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+<script src="{{ asset('public/assets/js/sweetalert2.min.js') }}"></script>
         
         <!-- Template Main CSS File -->
         <link href="{{ asset('public/assets/css/style.css')}}" rel="stylesheet">

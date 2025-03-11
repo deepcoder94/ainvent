@@ -5,6 +5,9 @@ use App\Models\Beat;
 use App\Models\Customer;
 use App\Models\CustomerPayment;
 use Illuminate\Http\Request;
+use App\Models\Inventory;
+use App\Models\Invoice;
+use App\Models\InvoiceProduct;
 
 class CustomerController extends Controller
 {
@@ -13,7 +16,7 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = Customer::with('beat')->get();
+        $customers = Customer::with('beat')->with('payments')->get();
         $beats     = Beat::get();
         return view('pages.customers.list', ['currentPage' => 'customers', 'customers' => $customers, 'beats' => $beats]);
 
@@ -164,40 +167,6 @@ class CustomerController extends Controller
         $cust = $query->get();
 
         return view('pages.customers.single',['customers'=>$cust]);
-    }
-
-    public function paymentsList(){
-        $customerpayments = CustomerPayment::with('customer')->get();
-        $beats     = Beat::get();
-        return view('pages.payments.list', ['currentPage' => 'customer_payments', 'customerpayments' => $customerpayments, 'beats' => $beats]);
-
-    }
-
-    public function paymentsUpdate(Request $request,$id){
-        try{
-            $resource = CustomerPayment::findOrFail($id);
-
-            $payment = $resource->update([
-                'total_due'    => $request->due,
-                'invoice_total'=> 0
-            ]);
-            $success = true;
-            $message = 'Customer updated successfully';
-        }
-        catch(\Exception $e){
-            $success = false;
-            $message = $e->getMessage();
-        }
-        return response()->json([
-            'success' => $success,
-            'message' => $message,
-        ]);
-
-
-    }
-
-    public function getPaymentsByBeat(Request $request,$beatId){
-        dd('123');
     }
 
 }

@@ -24,10 +24,10 @@ class InvoiceController extends Controller
     {
         $customers   = Customer::get();
         $beats       = Beat::get();
-        $products    = Product::with('measurements')->get();
+        $products    = Product::with('measurements')->with('inventory')->get();
         $measurement = Measurement::get();
 
-        return view('pages.invoices.generate', ['currentPage' => 'invoicesCreate', 'beats' => $beats, 'customers' => $customers, 'products' => $products, 'measurements' => $measurement]);
+        return view('pages.generate-invoice.generate', ['currentPage' => 'invoicesCreate', 'beats' => $beats, 'customers' => $customers, 'products' => $products, 'measurements' => $measurement]);
     }
 
     public function list()
@@ -114,6 +114,9 @@ class InvoiceController extends Controller
                 'beat_id' => $request->input('beat_id')
             ]);
 
+            $invoiceNumber = 'INV-'.$newInvoice->id;
+            $newInvoice->invoice_number = $invoiceNumber;
+            $newInvoice->save();
             $total = 0;
 
             foreach ($products as $product) {
@@ -149,8 +152,17 @@ class InvoiceController extends Controller
             }
 
             $payment = CustomerPayment::where('customer_id',$request->input('customer_id'))->get()->first();
-            $payment->invoice_total += $total;
-            $payment->save();
+            if(!empty($payment)){
+                $payment->invoice_total += $total;
+                $payment->save();    
+            }
+            else{
+                CustomerPayment::create([
+                    'customer_id'=>$request->input('customer_id'),
+                    'invoice_total'=>$total,
+                    'total_due'=>$total
+                ]);
+            }
 
             $success = true;
             $message = 'Invoice saved successfully';
@@ -194,15 +206,16 @@ class InvoiceController extends Controller
             $query->whereDate('created_at',$formattedDate);
         }
         if(!empty($invId)){
-            $id = $invId;
-            if(str_contains($invId,'INV-') || str_contains($invId,'inv-')){
-                $id = str_replace('INV-','',$invId);
-                $id = str_replace('inv-','',$id);
-            }
-            $query->where('id',$id);
+            $query->where('invoice_number',$invId);
         }
         $records = $query->get();
         return view('pages.invoices.single',['invoices'=>$records]);
 
+    }
+
+    public function loadSingleProduct(Request $request,$id){
+        $products    = Product::with('measurements')->with('inventory')->get();
+        $measurement = Measurement::get();
+        return view('pages.generate-invoice.generate-product-single',compact('products','measurement','id'));
     }
 }

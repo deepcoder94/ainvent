@@ -46,10 +46,9 @@ class ProductController extends Controller
             ]);
 
             $product_measurements = $request->product_measurements;
+            ProductMeasurement::where('product_id',$product->id)->delete();
             foreach ($product_measurements as $m){
                 ProductMeasurement::firstOrCreate([
-                    'measurement_id' => $m
-                ],[
                     'product_id' => $product->id,
                     'measurement_id'=>$m
                 ]);    
@@ -109,11 +108,20 @@ class ProductController extends Controller
             ]);
             $resource = Product::findOrFail($id);
 
-            $beat = $resource->update([
+            $product = $resource->update([
                 'product_name'    => $request->product_name,
                 'product_rate' => $request->product_rate,
                 'is_active'    => $request->is_active,
             ]);
+            $product_measurements = $request->product_measurements;
+            ProductMeasurement::where('product_id',$resource->id)->delete();
+            foreach ($product_measurements as $m){
+                ProductMeasurement::firstOrCreate([
+                    'product_id' => $resource->id,
+                    'measurement_id'=>$m
+                ]);    
+            }
+
             $success = true;
             $message = 'Product updated successfully';
 

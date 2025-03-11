@@ -4,6 +4,11 @@
     <td>{{ $product->product_name }}</td>
     <td>{{ $product->product_rate }}</td>
     <td>
+        @foreach ($product->measurements as $m)
+            <span class="badge bg-primary">{{ $m->name }}</span>            
+        @endforeach
+    </td>
+    <td>
         <span
             class="badge {{ $product->is_active == 1 ? 'bg-success':'bg-danger' }}"
         >

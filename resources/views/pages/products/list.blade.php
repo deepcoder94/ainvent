@@ -29,6 +29,7 @@
                                         <th>ID</th>
                                         <th>Name</th>
                                         <th>Rate</th>
+                                        <th>Types</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -71,10 +72,17 @@
                 $("#product_active").prop("checked", false);
             }
 
-
             let measurements = productJson.measurements;
-            const measurementIds = measurements.map(measurement => measurement.measurement_id).join(',');
-            $("#product_measurements").val(measurementIds.split(',')).trigger('change');            
+            // const measurementIds = measurements.map(measurement => measurement.id).join(',');
+            measurements.some((m)=>{
+                let mid = document.getElementById("product_measurements_"+m.id);
+                if(mid){
+                    mid.checked = true
+                }
+            });
+
+            
+            // $("#product_measurements").val(measurementIds.split(',')).trigger('change');            
 
             $("#productModal").modal("show");
         }
@@ -88,15 +96,42 @@
                 url = $("#edit_url").val();
             }
 
+            let groupedValues = {};
+
+            // Group the values by name
+            form.forEach(function (field) {
+                if (field.name == "product_name" || field.name == "product_rate") {
+                    return false;
+                }
+
+                if (!groupedValues[field.name]) {
+                    groupedValues[field.name] = [];
+                }
+                groupedValues[field.name].push(field.value);
+            });
+
+            // Now create the array of objects with key-value pairs
+            let finalData = [];
+            let length = groupedValues["product_measurements[]"].length; // Assuming all fields have the same length
+
+            // Create key-value pair objects for each product
+            for (let i = 0; i < length; i++) {
+                finalData.push(groupedValues["product_measurements[]"][i])
+            }
+
+            
+            
+
             let data = {
                 product_name: form.find((item) => item.name === "product_name")
                     .value,
                 product_rate: form.find((item) => item.name === "product_rate")
                     .value,
                 is_active: $("#product_active").prop("checked") ? 1 : 0,
-                product_measurements: $("#product_measurements").val()
+                product_measurements: finalData
             };
             
+                        
             $.ajax({
                 url: url, // The URL defined in your routes
                 type: "POST",

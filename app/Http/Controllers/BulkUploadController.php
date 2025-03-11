@@ -3,12 +3,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Beat;
 use App\Models\Customer;
+use App\Models\Measurement;
 use App\Models\Product;
+use App\Models\Inventory;
+use App\Models\InventoryHistory;
+
 use App\Models\ProductMeasurement;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class BulkUploadController extends Controller
 {
@@ -224,5 +226,63 @@ class BulkUploadController extends Controller
         }
 
         return response()->download($path)->deleteFileAfterSend(true);
+    }
+
+    public function uploadInventoryCsv(Request $request){
+        // Validate the uploaded file
+        $request->validate([
+            'file_csv' => 'required|mimes:csv,txt|max:2048', // You can adjust file type and size
+        ]);
+
+        // Handle file upload
+        if ($request->hasFile('file_csv')) {
+            $file = $request->file('file_csv');
+
+            // Process the CSV (example)
+            $csvData = $this->parseCsv($file);
+            foreach ($csvData as $csv) {
+                // Use Laravel's Collection to transform the keys
+                $newArray = collect($csv)
+                    ->mapWithKeys(function ($value, $key) {
+                        // Convert the key to lowercase and replace spaces with underscores
+                        $newKey = strtolower(str_replace(' ', '_', $key));
+                        return [$newKey => $value];
+                    })
+                    ->toArray();
+
+                // Product 
+                $productExist = Product::where('product_name',$newArray['product_name'])->get()->first();
+                // Type
+                
+                $typeExist = Measurement::where('name',$newArray['type'])->get()->first();
+                if(empty($productExist) || empty($typeExist)){
+                    return response()->json(['error' => 'Invalid Product or Type'], 400);         
+                }
+                
+                $qty = $newArray['quantity']*(int)$typeExist->quantity;
+
+                $inventory = Inventory::where('product_id',$productExist->id)->get()->first();
+                
+                $inventory->buying_price = $newArray['buy_price'];
+                $inventory->total_stock += $qty;
+                $inventory->save();
+
+                InventoryHistory::create([
+                    'product_id' => (int)$productExist->id,
+                    'measurement_id' => (int)$typeExist->id,
+                    'stock_out_in'   => (int)$qty,
+                    'stock_action'  => 'add',
+                    'buying_price'  => $newArray['buy_price']
+                ]);
+            }
+
+            return response()->json(['success' => 'File uploaded successfully!']);
+        }
+
+        return response()->json(['error' => 'No file uploaded.'], 400);         
+    }
+
+    public function generateInventoryCsv(){
+        
     }
 }

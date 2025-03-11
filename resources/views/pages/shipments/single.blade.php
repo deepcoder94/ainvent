@@ -12,7 +12,7 @@
             />
         </div>
     </td>
-    <td>INV-{{ $invoice['invoice']->id }}</td>
+    <td>{{ $invoice['invoice']->invoice_number }}</td>
     <td>
         {{ $invoice['invoice']->customer->customer_name }}
     </td>

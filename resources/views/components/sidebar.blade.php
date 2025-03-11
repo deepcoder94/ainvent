@@ -15,6 +15,13 @@
             </a>
           </li><!-- End F.A.Q Page Nav -->
           <li class="nav-item">
+            <a class="nav-link {{ $currentPage=='gstInvoice'?'':'collapsed' }}" href="{{ route('showGstInvoiceForm') }}">
+              <i class="bi bi-clipboard-plus"></i>
+              <span>Generate GST Invoice</span>
+            </a>
+          </li><!-- End F.A.Q Page Nav -->
+
+          <li class="nav-item">
             <a class="nav-link {{ $currentPage=='invoicesList'?'':'collapsed' }}" href="{{ route('invoiceList') }}">
               <i class="bi bi-clipboard-data"></i>
               <span>Invoice List</span>
@@ -76,7 +83,7 @@
       </li><!-- End Register Page Nav -->                  
 
       <li class="nav-item">
-        <a class="nav-link  {{ $currentPage=='returns'?'':'collapsed' }}" href="{{ route('paymentsList') }}">
+        <a class="nav-link  {{ $currentPage=='returns'?'':'collapsed' }}" href="{{ route('showReturnForm') }}">
           <i class="bi bi-box-arrow-in-up"></i>
           <span>Manage Returns</span>
         </a>

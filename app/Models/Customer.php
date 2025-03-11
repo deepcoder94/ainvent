@@ -11,4 +11,8 @@ class Customer extends Model
     public function beat(){
         return $this->belongsTo(Beat::class, 'beat_id');
     }
+
+    public function payments(){
+        return $this->hasOne(CustomerPayment::class);
+    }
 }

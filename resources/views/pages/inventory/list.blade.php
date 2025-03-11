@@ -1,6 +1,15 @@
 <x-layout :currentPage="$currentPage">
     <div class="mt-2 mb-2">
-        <button class="btn btn-primary" onclick="showCreateForm()">Add New</button>    
+        <button class="btn btn-primary" onclick="showCreateForm()">Add New</button>  
+        <button class="btn btn-dark mt-2 mb-2" onclick="startBulkUpload()">
+            <i class="bi bi-upload me-1"></i> Upload Bulk
+        </button>        
+        <input type="file" id="csv-file" accept=".csv, .txt" style="display: none" onchange="uploadBulk()" />
+    
+        <button class="btn btn-warning mt-2 mb-2" onclick="exportInventory()">
+            <i class="bi bi-download me-1"></i> Export 
+        </button>        
+    
     </div>    
     <section class="section">
         <div class="row">
@@ -152,5 +161,62 @@
         invProductCount--
 
     }
-      </script>      
+
+    function startBulkUpload(){
+        $("#csv-file").click();            
+    }      
+
+    function uploadBulk(){
+            var fileInput = $('#csv-file')[0];
+            
+            var file = fileInput.files[0];
+            var formData = new FormData();
+
+                formData.append('file_csv', file);
+
+                // Send the file to the server using AJAX
+                $.ajax({
+                    url: "{{ route('inventory.upload') }}",
+                    method: 'POST',
+                    data: formData,
+                    headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ), // CSRF Token
+                    },
+                    processData: false, // Don't process the data
+                    contentType: false, // Don't set content-type header
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire("Uploaded!", 'Successfully Uploaded!', "success");
+                            location.reload();                            
+                        } else if (response.error) {
+                            alert(response.error)
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert(error)
+                    }
+                });
+        }          
+
+        function exportInventory(){
+            $.ajax({
+            url: "{{ route('generate.inventory.csv') }}", // The route to your export method
+            type: 'GET',
+            headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ), // CSRF Token
+                    },
+            success: function(response) {
+                window.location.href = response.url_path;
+            },
+            error: function(xhr, status, error) {
+                alert('There was an error exporting the CSV. Please try again.');
+            }
+        });                        
+        }
+    
+        </script>      
       </x-layout>
