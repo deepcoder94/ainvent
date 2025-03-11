@@ -47,11 +47,26 @@
                             <label for="product_rate" class="form-label"
                                 >Measurement Types</label
                             >
-                                <select class="form-select" name="product_measurements[]" id="product_measurements" multiple aria-label="multiple select example">
+                            <div class="row">
+                                @foreach ($measurements as $m)
+                                <div class="col-lg-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input measurements" name="product_measurements[]" id="product_measurements_{{ $m->id }}" type="checkbox" value="{{ $m->id }}">
+                                        <label class="form-check-label">
+                                            {{ $m->name }}
+                                        </label>
+                                      </div>
+        
+                                </div>
+                                @endforeach
+    
+                            </div>
+
+                                {{-- <select class="form-select" name="product_measurements[]" id="product_measurements" multiple aria-label="multiple select example">
                                   @foreach ($measurements as $m)
                                       <option value="{{ $m->id }}">{{ $m->name }}</option>                                      
                                   @endforeach
-                                </select>
+                                </select> --}}
             
                         </div>                        
                         <div class="col-12">

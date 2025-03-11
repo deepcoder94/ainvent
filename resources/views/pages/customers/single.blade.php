@@ -5,6 +5,9 @@
                                     <td>{{ $customer->customer_name }}</td>
                                     <td>{{ $customer->beat->beat_name }}</td>
                                     <td>
+                                        {{ $customer->payments->total_due ?? 'NA' }}
+                                    </td>
+                                    <td>
                                         <span class="badge  {{ $customer->is_active == 1 ? 'bg-success':'bg-danger' }}">{{ $customer->is_active == 1 ? 'Active':'Inactive' }}</span>
                                     </td>
                                     <td>

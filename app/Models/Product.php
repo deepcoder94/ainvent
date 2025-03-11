@@ -9,6 +9,9 @@ class Product extends Model
     protected $fillable = ['product_name','product_rate','is_active'];    
     public function measurements()
     {
-        return $this->hasMany(ProductMeasurement::class, 'product_id');
+        return $this->belongsToMany(Measurement::class, 'product_measurements', 'product_id', 'measurement_id');
+    }
+    public function inventory(){
+        return $this->hasOne(Inventory::class,'product_id');
     }
 }
