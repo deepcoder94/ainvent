@@ -13,6 +13,7 @@ use App\Http\Controllers\BulkUploadController;
 use App\Http\Controllers\GstInvoiceController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReturnController;
+use Illuminate\Http\Request;
 
 Route::get('/', [DashboardController::class,'index'])->name('index');
 Route::get('/dashboard', [DashboardController::class,'index'])->name('dashboard');
@@ -82,3 +83,9 @@ Route::get('/loadSingleProduct/{id}',[InvoiceController::class,'loadSingleProduc
 
 Route::get('/gst/form',[GstInvoiceController::class,'showGstInvoiceForm'])->name('showGstInvoiceForm');
 Route::post('/generateGstInvoice',[GstInvoiceController::class,'generateGstInvoice'])->name('generateGstInvoice');
+Route::get('/addGstProduct/{id}',function(Request $request,$id){
+    return view('pages.generate-gst.add-single-product',compact('id'));
+})->name('addGstProduct');
+
+Route::get('/payment/history',[PaymentController::class,'paymentHistory'])->name('paymentHistory');
+Route::get('/getSingleInvoicePaymentDetail/{id}',[PaymentController::class,'getSingleInvoicePaymentDetail'])->name('getSingleInvoicePaymentDetail');

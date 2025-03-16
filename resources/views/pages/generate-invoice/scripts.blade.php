@@ -3,6 +3,7 @@
     var productNumber = 0;
     var isValid=false
     var isQtyValid=false
+    var isRateValid = false;
 
 
     function clearInputErrors(field){
@@ -50,12 +51,11 @@
             success: function (response) {
                 $("#products_tbody").append(response)
             },
-            error: function (xhr, status, error) {
-                alert(error);
+            error: function (xhr, status, error) {                
+                alert(xhr.responseJSON.message);
             },
         });
         
-        // $("#products_tbody").append(productsTr);
     }
 
     function getProductTypes(event,id){
@@ -179,6 +179,10 @@
             alert('Invalid inputs. please check once')
             return;
         }
+        if(!isRateValid){
+            alert('Invalid inputs. please check once')
+            return;
+        }        
         
         let data = {
             beat_id: formValues.find((item) => item.name === "beat_id")
@@ -239,7 +243,11 @@
         let prod =productJson.filter((j)=>{
             return j.id == selected_pro
         })
+        
         let totalstock = prod[0].inventory.total_stock
+
+        let minrate = prod[0].product_rate;
+        $("#min_rate_span"+id).html('Min Rate: '+minrate);
 
         let type_qty = prod[0].measurements.filter((m)=>{
             return m.id == selected_type
@@ -253,6 +261,7 @@
             'step':0.1
         });
         $("#qty_"+id).attr('data-maxqty',(totalstock/type_qty));
+        $("#qty_"+id).attr('data-minrate',minrate);
                 
     }
 
@@ -266,5 +275,16 @@
         if(qty > allowedqty){
             isQtyValid = false
         }     
+    }
+
+    function restrictRate(id){
+        let rate = parseFloat($("#rate_"+id).val());
+        let allowedminrate = parseFloat($("#qty_"+id).attr('data-minrate'));
+        if(rate > allowedminrate){
+            isRateValid = true;
+        }
+        if(rate <= allowedminrate){
+            isRateValid = false;
+        }
     }
 </script>

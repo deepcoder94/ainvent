@@ -32,7 +32,7 @@
                                             <span class="badge bg-danger">Deducted</span>   
                                         @endif                                        
                                     </td>
-                                    <td>{{ \Carbon\Carbon::parse($i->created_at)->format('d-m-Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($i->created_at)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

@@ -20,7 +20,7 @@
         {{ $invoice['invoice']->beat->beat_name }}
     </td>
     <td>
-        {{ \Carbon\Carbon::parse($invoice['invoice']->created_at)->format('d-m-Y') }}
+        {{ \Carbon\Carbon::parse($invoice['invoice']->created_at)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s') }}
     </td>
     <td>
         @if($invoice['status'] == 1)

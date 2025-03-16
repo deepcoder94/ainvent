@@ -32,4 +32,8 @@ class Invoice extends Model
         return $this->belongsToMany(Measurement::class, 'invoice_products', 'invoice_id', 'measurement_id')
                     ->withPivot('quantity', 'rate'); // Include pivot data like quantity and price
     }    
+
+    public function payments(){
+        return $this->hasMany(PaymentHistory::class,'invoice_id');
+    }
 }

@@ -48,7 +48,12 @@ class InventoryController extends Controller
                 if(!empty($product)){
                     // If product exists, increase the quantity
 
-                    $product->buying_price = $record['inv_buying_price'];
+                    // average of existing and new
+                    $total_buying = floatval($product->buying_price) + floatval($record['inv_buying_price']);
+                    $avg = number_format($total_buying / 2,2);
+
+                    $product->buying_price = $avg;
+
                     $product->total_stock += $total_qty;
                     $product->save();
 

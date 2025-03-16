@@ -83,6 +83,13 @@
       </li><!-- End Register Page Nav -->                  
 
       <li class="nav-item">
+        <a class="nav-link  {{ $currentPage=='payment_history'?'':'collapsed' }}" href="{{ route('paymentHistory') }}">
+          <i class="bi bi-cash-stack"></i>
+          <span>Payments History</span>
+        </a>
+      </li><!-- End Register Page Nav -->                        
+
+      <li class="nav-item">
         <a class="nav-link  {{ $currentPage=='returns'?'':'collapsed' }}" href="{{ route('showReturnForm') }}">
           <i class="bi bi-box-arrow-in-up"></i>
           <span>Manage Returns</span>
