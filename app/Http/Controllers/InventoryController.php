@@ -42,17 +42,29 @@ class InventoryController extends Controller
                 // Get product from inventory if exists
     
                 $product = Inventory::where('product_id', $product_id)->get()->first();
-                $mea_qty = Measurement::where('id', (int)$record['inv_mea'])->first()->quantity;
-                $total_qty = (int)$record['inv_qty'] * $mea_qty;
+                $mea_qty = Measurement::where('id', floatval($record['inv_mea']))->first()->quantity;
+                $total_qty = floatval($record['inv_qty']) * $mea_qty;
 
                 if(!empty($product)){
                     // If product exists, increase the quantity
 
                     // average of existing and new
-                    $total_buying = floatval($product->buying_price) + floatval($record['inv_buying_price']);
-                    $avg = number_format($total_buying / 2,2);
+                    // $total_buying = floatval($product->buying_price) + floatval($record['inv_buying_price']);
+                    // $avg = number_format($total_buying / 2,2);
 
+                    $existStockTotal = floatval($product->total_stock);
+                    $existBuyingPrice = floatval($product->buying_price);
+                    $newStockTotal = $total_qty;
+                    $newBuyingPrice = floatval($record['inv_buying_price']);
+
+                    $bTotal = $existStockTotal * $existBuyingPrice;
+                    $sTotal = $newStockTotal * $newBuyingPrice;
+                    $qtyTotal = $existStockTotal+$newStockTotal;
+
+
+                    $avg = number_format(($bTotal+$sTotal)/$qtyTotal,3);
                     $product->buying_price = $avg;
+
 
                     $product->total_stock += $total_qty;
                     $product->save();
@@ -62,7 +74,7 @@ class InventoryController extends Controller
                         'measurement_id' => (int)$record['inv_mea'],
                         'stock_out_in'   => (int)$record['inv_qty'],
                         'stock_action'  => 'add',
-                        'buying_price'  => $record['inv_buying_price']
+                        'buying_price'  => $avg
                     ]);
 
                 }
