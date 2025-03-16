@@ -16,6 +16,8 @@
                                             onclick="confirmRecord('{{ $customer->id }}')"
                                             data-invoicetotal="{{ $customer->invoice_total }}"
                                             data-duetotal="{{ $customer->total_due }}"
+                                            data-customerid="{{ $customer->customer_id }}"
+
                                         >
                                             <i class="bi bi-check-lg"></i>
                                         </button>                                        

@@ -1,38 +1,43 @@
 <x-layout :currentPage="$currentPage">
-    <div>
-        <button class="btn btn-primary mt-2 mb-2" onclick="printInvoice()">
-            Print Invoice
-        </button>
-        <button
-            class="btn btn-success"
-            style="float: right; margin-top: 10px; margin-left: 10px"
+    <div class="row">
+        <div class="col-lg-3">
+            <button class="btn btn-primary mt-2 mb-2" onclick="printInvoice()">
+                Print Invoice
+            </button>    
+        </div>
+        <div class="col-lg-3">
+            <input
+            type="text"
+            id="invoiceId"
+            placeholder="Search Invoice ID"
+            class="form-control mt-2 mb-2"
+            onblur="searchInvoice()"
+            onkeyup="searchInvoice()"
+        />
+
+        </div>
+        <div class="col-lg-3">
+            <input
+            type="text"
+            id="datepicker"
+            placeholder="Search Date"
+            class="form-control mt-2 mb-2"
+            onchange="searchInvoice()"
+        />
+
+        </div>
+        <div class="col-lg-3">
+            <button
+            class="btn btn-success mt-2 mb-2"
             onclick="searchInvoice(true)"
         >
             Clear
         </button>
+        </div>
 
-        <input
-            type="text"
-            id="invoiceId"
-            placeholder="Search Invoice ID"
-            style="float: right; margin-top: 10px; width: unset"
-            class="form-control"
-            onblur="searchInvoice()"
-            onkeyup="searchInvoice()"
-        />
-        <input
-            type="text"
-            id="datepicker"
-            placeholder="Search Date"
-            style="
-                float: right;
-                margin-top: 10px;
-                width: unset;
-                margin-right: 10px;
-            "
-            class="form-control"
-            onchange="searchInvoice()"
-        />
+    </div>
+    <div>
+
     </div>
 
     <section class="section">

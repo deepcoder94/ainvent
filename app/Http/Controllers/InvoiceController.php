@@ -71,7 +71,7 @@ class InvoiceController extends Controller
             $grandTotal = $total;
             $customer = $invoice->customer;
             $invoice_number = 'INV-' . $invoice->id;
-            $date = \Carbon\Carbon::parse($invoice->created_at)->format('d-m-Y');
+            $date = \Carbon\Carbon::parse($invoice->created_at)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s');
             $beat_name = $invoice->beat->beat_name;
             $distributor = Distributor::get()->first();
 
@@ -151,18 +151,12 @@ class InvoiceController extends Controller
 
             }
 
-            $payment = CustomerPayment::where('customer_id',$request->input('customer_id'))->get()->first();
-            if(!empty($payment)){
-                $payment->invoice_total += $total;
-                $payment->save();    
-            }
-            else{
                 CustomerPayment::create([
                     'customer_id'=>$request->input('customer_id'),
                     'invoice_total'=>$total,
-                    'total_due'=>$total
+                    'total_due'=>$total,
+                    'invoice_id'=>$newInvoice->id
                 ]);
-            }
 
             $success = true;
             $message = 'Invoice saved successfully';
@@ -209,13 +203,20 @@ class InvoiceController extends Controller
             $query->where('invoice_number',$invId);
         }
         $records = $query->get();
-        return view('pages.invoices.single',['invoices'=>$records]);
+        return view('pages.invoices.list-single',['invoices'=>$records]);
 
     }
 
     public function loadSingleProduct(Request $request,$id){
         $products    = Product::with('measurements')->with('inventory')->get();
+        $filteredProds = [];
+        foreach($products as $p){
+            if(empty($p->inventory) || $p->total_stock > 0){
+                continue;
+            }
+            array_push($filteredProds,$p);
+        }
         $measurement = Measurement::get();
-        return view('pages.generate-invoice.generate-product-single',compact('products','measurement','id'));
+        return view('pages.generate-invoice.generate-product-single',compact('filteredProds','measurement','id'));
     }
 }

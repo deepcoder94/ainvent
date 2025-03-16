@@ -2,6 +2,7 @@
 @forelse ($customerpayments as $customer)
                                 <tr>
                                     <td>{{ $customer->customer->customer_name }}</td>
+                                    <td>{{ $customer->invoice->invoice_number }}</td>
                                     <td>{{ $customer->invoice_total }}</td>
                                     <td>
                                         <input type="text" value="0.00" id="paid_total_{{ $customer->id }}" class="form-control">                                        
@@ -16,6 +17,8 @@
                                             onclick="confirmRecord('{{ $customer->id }}')"
                                             data-invoicetotal="{{ $customer->invoice_total }}"
                                             data-duetotal="{{ $customer->total_due }}"
+                                            data-invoiceid="{{ $customer->invoice_id }}"
+                                            data-customerid="{{ $customer->customer_id }}"
                                         >
                                             <i class="bi bi-check-lg"></i>
                                         </button>                                        
