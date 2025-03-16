@@ -109,7 +109,7 @@ class GstInvoiceController extends Controller
         $pdf->setPaper('A4');
         $pdfContent = $pdf->output();
         // Add the PDF to the zip with a unique filename (e.g., invoice number)
-        $zip->addFromString('shipment_'.$currentDate.'.pdf', $pdfContent);
+        $zip->addFromString('gst_invoice_'.$currentDate.'.pdf', $pdfContent);
         // Close the zip file
         $zip->close();
 
