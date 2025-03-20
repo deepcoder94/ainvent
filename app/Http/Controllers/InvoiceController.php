@@ -17,6 +17,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use ZipArchive;
 use App\Models\InventoryHistory;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class InvoiceController extends Controller
 {
@@ -32,8 +33,18 @@ class InvoiceController extends Controller
 
     public function list()
     {
-        $invoices = Invoice::with('customer')->with('beat')->orderBy('id','desc')->get();
-        return view('pages.invoices.list', ['currentPage' => 'invoicesList', 'invoices' => $invoices]);
+        $customers = Customer::get();
+        $beats = Beat::get();
+
+        $pages = Invoice::selectRaw('DATE(created_at) as date, count(*) as count')
+        ->groupBy(DB::raw('DATE(created_at)'))
+        ->orderBy(DB::raw('DATE(created_at)'), 'desc')
+        ->get();
+
+        $firstPage = $pages[0]['date'];
+
+        $invoices = Invoice::with('customer')->with('beat')->whereDate('created_at',$firstPage)->orderBy('id','desc')->get();
+        return view('pages.invoices.list', ['currentPage' => 'invoicesList', 'invoices' => $invoices,'customers'=>$customers,'beats'=>$beats,'pages'=>$pages]);
     }
 
     public function loadpdf(Request $request)
@@ -49,6 +60,8 @@ class InvoiceController extends Controller
         if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
             return response()->json(['error' => 'Failed to create zip file'], 500);
         }
+
+        $finalArray = [];
 
         foreach ($invoices as $i) {
             // Fetch invoice data
@@ -75,15 +88,20 @@ class InvoiceController extends Controller
             $beat_name = $invoice->beat->beat_name;
             $distributor = Distributor::get()->first();
 
+
             $data = compact('items', 'total', 'grandTotal', 'customer', 'invoice_number', 'date', 'beat_name', 'distributor');
+            $finalArray[] = $data;
+
+        }
+        $invoicesArray = ['invoices'=>$finalArray];
             // Generate the PDF for the current invoice
-            $pdf = PDF::loadView('pages.invoices.invoice-pdf', $data);
+            $pdf = PDF::loadView('pages.invoices.invoice-pdf', $invoicesArray);
             $pdf->setPaper('A5');
             $pdfContent = $pdf->output();
 
             // Add the PDF to the zip with a unique filename (e.g., invoice number)
-            $zip->addFromString('invoice_' . $i . '.pdf', $pdfContent);
-        }
+            $zip->addFromString('invoices.pdf', $pdfContent);
+
 
         // Close the zip file
         $zip->close();
@@ -158,6 +176,9 @@ class InvoiceController extends Controller
                     'invoice_id'=>$newInvoice->id
                 ]);
 
+                $newInvoice->invoice_total = $total;
+                $newInvoice->save();
+
             $success = true;
             $message = 'Invoice saved successfully';
         } catch (\Exception $e) {
@@ -194,15 +215,29 @@ class InvoiceController extends Controller
     public function searchInvoice(Request $request){
         $invId =$request->input('invId');
         $invDate =$request->input('invDate');
+        $invCustomer =$request->input('invCustomer');
+        $invBeat =$request->input('invBeat');
+        $invDate2 =$request->input('invDate2');
+
+
         $query = Invoice::query();
         if(!empty($invDate)){
             $formattedDate = Carbon::createFromFormat('m/d/Y', $invDate)->format('Y-m-d');
             $query->whereDate('created_at',$formattedDate);
         }
+        if(!empty($invDate2)){
+            $query->whereDate('created_at',$invDate2);
+        }        
         if(!empty($invId)){
             $query->where('invoice_number',$invId);
         }
-        $records = $query->get();
+        if(!empty($invCustomer)){
+            $query->where('customer_id',(int)$invCustomer);
+        }
+        if(!empty($invBeat)){
+            $query->where('beat_id',(int)$invBeat);
+        }        
+        $records = $query->orderBy('id','desc')->get();
         return view('pages.invoices.list-single',['invoices'=>$records]);
 
     }

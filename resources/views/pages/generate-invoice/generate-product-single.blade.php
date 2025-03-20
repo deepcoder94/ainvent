@@ -1,6 +1,6 @@
 <tr class="product_{{ $id }}">
     <td scope="col">
-        <select class="form-control" name="product_id[]" id="product_slct_{{$id}}" onchange="getProductTypes(event,'{{ $id }}')">
+        <select class="form-control sel2input" name="product_id[]" id="product_slct_{{$id}}" onchange="getProductTypes(event,'{{ $id }}')">
             <option value="">Select</option>
             @foreach ($filteredProds as $p)
                 <option value="{{ $p->id }}" style="display: {{ $p->inventory->total_stock > 0 ? 'block':'none' }}">{{ $p->product_name }} </option>
@@ -8,7 +8,7 @@
         </select>
     </td>
     <td scope="col" >
-        <select class="form-control" name="measurement_id[]" id="meas_{{ $id }}" onchange="getMaxQty('{{ $id }}')">
+        <select class="form-control sel2input" name="measurement_id[]" id="meas_{{ $id }}" onchange="getMaxQty('{{ $id }}')">
             <option value="">Select</option>
 
         </select>

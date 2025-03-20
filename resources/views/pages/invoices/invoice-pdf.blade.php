@@ -56,10 +56,13 @@
         .invoice-details th {
             background-color: transparent;
         }
-
+        .page-break {
+            page-break-before: always;
+        }
     </style>
 </head>
 <body>
+    @foreach ($invoices as $index => $i)
 
     <!-- Invoice Header (Company and Invoice Details) -->
     <div class="invoice-header">
@@ -69,18 +72,18 @@
         <!-- Left side: Company Information -->
         <div class="left">
             <p>
-                <strong>{{ $distributor->name }}</strong><br>
-                {{ $distributor->address }}<br/>
-                GST: {{ $distributor->gst_number }}<br>
-                Phone: {{ $distributor->phone_number }}
+                <strong>{{ $i['distributor']->name }}</strong><br>
+                {{ $i['distributor']->address }}<br/>
+                GST: {{ $i['distributor']->gst_number }}<br>
+                Phone: {{ $i['distributor']->phone_number }}
             </p>
         </div>
 
         <!-- Right side: Invoice Information -->
         <div class="right">
             <p>
-                <strong>INV NO:</strong> {{ $invoice_number }}<br/>
-                <strong>Date:</strong> {{ $date }}
+                <strong>INV NO:</strong> {{ $i['invoice_number'] }}<br/>
+                <strong>Date:</strong> {{ $i['date'] }}
             </p>
         </div>
     </div>
@@ -91,17 +94,17 @@
         <!-- Left side: Customer Information -->
         <div class="left">
             <p>
-                <strong>{{ $customer->customer_name }}</strong><br>
-                {{ $customer->customer_address }}<br/>
-                Contact: {{ $customer->customer_phone }}<br>
-                GST: {{ $customer->customer_gst }}
+                <strong>{{ $i['customer']->customer_name }}</strong><br>
+                {{ $i['customer']->customer_address }}<br/>
+                Contact: {{ $i['customer']->customer_phone }}<br>
+                GST: {{ $i['customer']->customer_gst }}
             </p>
         </div>
 
         <!-- Right side: Beat Name Information -->
         <div class="right">
             <p>
-                <strong>BEAT:</strong> {{ $beat_name }}<br/>
+                <strong>BEAT:</strong> {{ $i['beat_name'] }}<br/>
             </p>
         </div>
     </div>
@@ -120,7 +123,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($items as $item)
+            @foreach ($i['items'] as $item)
                 <tr>
                     <td>{{ $item['qty'] }}</td>
                     <td>{{ $item['type'] }}</td>
@@ -131,10 +134,15 @@
             @endforeach
             <tr>
                 <td colspan="4" style="text-align: right; font-weight: bold;">Total</td>
-                <td>{{ number_format($total, 2) }}</td>
+                <td>{{ number_format($i['total'], 2) }}</td>
             </tr>            
         </tbody>
-    </table>
+    </table>    
+    @if ($index < count($invoices) - 1)
+        <div class="page-break"></div>
+    @endif
+    @endforeach
+
 
 </body>
 </html>

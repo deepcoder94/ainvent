@@ -254,13 +254,15 @@
         })
         type_qty = type_qty[0].quantity
 
-        $("#max_qty_span"+id).html('Max Quantity: '+(totalstock/type_qty))
+        let maxQty = (totalstock/type_qty).toFixed(2);
+
+        $("#max_qty_span"+id).html('Max Quantity: '+maxQty)
         $("#qty_"+id).attr({
             'min':0,
             'max':(totalstock/type_qty),
             'step':0.1
         });
-        $("#qty_"+id).attr('data-maxqty',(totalstock/type_qty));
+        $("#qty_"+id).attr('data-maxqty',maxQty);
         $("#qty_"+id).attr('data-minrate',minrate);
                 
     }

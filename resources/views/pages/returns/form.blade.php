@@ -17,7 +17,7 @@
                                     for="inputNanme4"
                                     class="form-label"
                                     >Select Invoice</label>
-                                    <select id="invoiceId" name="invoice_id" class="form-control" onchange="getProducts(event)">
+                                    <select id="invoiceId" name="invoice_id" class="form-control sel2input" onchange="getProducts(event)">
                                         <option value="">Select</option>
                                         @foreach ($invoices as $i)
                                             <option value="{{ $i->id }}">{{ $i->invoice_number }}</option>                                            

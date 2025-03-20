@@ -1,22 +1,22 @@
 <x-layout :currentPage="$currentPage">
     <div class="row">
-        <div class="col-lg-3">
+        <div class="col-lg-2">
             <button class="btn btn-primary mt-2 mb-2" onclick="printInvoice()">
                 Print Invoice
             </button>    
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-2">
             <input
             type="text"
             id="invoiceId"
-            placeholder="Search Invoice ID"
+            placeholder="Invoice ID"
             class="form-control mt-2 mb-2"
             onblur="searchInvoice()"
             onkeyup="searchInvoice()"
         />
 
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-2">
             <input
             type="text"
             id="datepicker"
@@ -26,7 +26,28 @@
         />
 
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-2 mt-3">
+            <select id="beatSelection" class="form-control mt-2 mb-2 sel2input" onchange="searchInvoice()">
+                <option value="">Beats</option>
+                @forelse ($beats as $c)
+                    <option value="{{ $c->id }}">{{ $c->beat_name }}</option>
+                @empty
+                    
+                @endforelse
+            </select>
+        </div>        
+        <div class="col-lg-2 mt-3">
+            <select id="customerSelection" class="form-control mt-2 mb-2 sel2input" onchange="searchInvoice()">
+                <option value="">Customer</option>
+                @forelse ($customers as $c)
+                    <option value="{{ $c->id }}">{{ $c->customer_name }}</option>
+                @empty
+                    
+                @endforelse
+            </select>
+        </div>
+
+        <div class="col-lg-1">
             <button
             class="btn btn-success mt-2 mb-2"
             onclick="searchInvoice(true)"
@@ -35,6 +56,18 @@
         </button>
         </div>
 
+    </div>
+    <div class="row mb-2 mt-2">
+        <div class="col-lg-2">
+            Current Page
+            <select class="form-control" id="pageDate" onchange="searchInvoice()">
+                @forelse ($pages as $p)
+                    <option value="{{ $p['date'] }}">{{ $p['date'] }}</option>
+                @empty
+                    
+                @endforelse
+            </select>
+        </div>
     </div>
     <div>
 
@@ -62,6 +95,7 @@
                                     <th>Invoice No.</th>
                                     <th>Customer Name</th>
                                     <th>Beat Name</th>
+                                    <th>Invoice Total</th>
                                     <th>Invoice Date</th>
                                 </tr>
                             </thead>
@@ -69,7 +103,7 @@
                                 @include('pages.invoices.list-single',['invoices'=>$invoices])
                             </tbody>
                         </table>
-                        <!-- End Table with stripped rows -->
+
                     </div>
                 </div>
 
@@ -150,9 +184,17 @@
             if(clearFilter){
             $("#invoiceId").val('');
             $("#datepicker").val('');
+            $("#customerSelection").val('');
+            $("#beatSelection").val('');
+            $("#pageDate").val('');
+
         }            
             let invId = $("#invoiceId").val();
             let invDate = $("#datepicker").val();
+            let invCustomer = $("#customerSelection").val();  
+            let invBeat = $("#beatSelection").val();    
+            let invDate2 = $("#pageDate").val();            
+
 
             $.ajax({
             url: "{{ route('invoice.search') }}",  // The URL defined in your routes
@@ -160,7 +202,7 @@
             headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')  // CSRF Token
             },
-            data: { invId:invId,invDate: invDate },
+            data: { invId:invId,invDate: invDate,invCustomer:invCustomer,invBeat:invBeat,invDate2:invDate2 },
             success: function(response) {     
                 $("#invoice_body").html(response)
             },
@@ -170,6 +212,10 @@
             }
     });            
         }
+
+    function searchCustomerInvoice(){
+
+    }        
         
     </script>
 </x-layout>

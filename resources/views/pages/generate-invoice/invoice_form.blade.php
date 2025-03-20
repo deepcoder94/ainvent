@@ -10,7 +10,7 @@
                 <select
                     id="beat_id"
                     name="beat_id"
-                    class="form-select"
+                    class="form-select sel2input"
                     onchange="getCustomers(event)"
                 >
                     <option value="">Choose...</option>
@@ -32,7 +32,7 @@
                 >
                 <select
                     id="customer_id"
-                    class="form-select"
+                    class="form-select sel2input"
                     name="customer_id"
                     onchange="clearInputErrors('invalid_customer')"
                 >
