@@ -15,6 +15,7 @@
         {{ $invoice->customer->customer_name }}
     </td>
     <td>{{ $invoice->beat->beat_name }}</td>
+    <td>{{ $invoice->invoice_total }}</td>
     <td>
         {{ \Carbon\Carbon::parse($invoice->created_at)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s') }}
     </td>
