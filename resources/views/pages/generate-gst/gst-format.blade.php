@@ -131,7 +131,7 @@
                         <td>{{ $p['product_unit_price'] }}</td>
                         <td>{{ $p['product_discount'] }}</td>
                         <td>{{ $p['product_taxable_amt'] }}</td>
-                        <td>{{ $p['product_tax_rate'] }}</td>
+                        <td>{{ $p['gst_rate'] }} + {{ $p['cess_rate'] }}<br/>{{ $p['state_cess_rate'] }} + {{ $p['non_advol_rate'] }}</td>
                         <td>{{ $p['product_other_charges'] }}</td>
                         <td>{{ $p['product_total'] }}</td>
                     </tr>                        

@@ -8,6 +8,8 @@
             <span class="badge bg-primary">{{ $m->name }}</span>            
         @endforeach
     </td>
+    <td>{{ $product->product_hsn }}</td>
+
     <td>
         <span
             class="badge {{ $product->is_active == 1 ? 'bg-success':'bg-danger' }}"

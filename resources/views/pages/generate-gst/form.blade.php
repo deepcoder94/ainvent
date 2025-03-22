@@ -108,13 +108,13 @@
                             <thead>
                                 <tr>
                                     <th>Item Description</th>
-                                    <th>Code</th>
+                                    <th>HSN Code</th>
                                     <th>Qty</th>
                                     <th>Unit</th>
                                     <th>Unit Price</th>
                                     <th>Discount</th>
                                     <th>Taxable Amt</th>
-                                    <th>Tax Rate</th>
+                                    <th>Tax Rate (GST,CESS<br/>State, Non Advol.)</th>
                                     <th>Other Charges</th>
                                     <th>Total</th>
                                     <th>#</th>

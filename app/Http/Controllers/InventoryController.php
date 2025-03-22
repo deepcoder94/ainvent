@@ -148,4 +148,9 @@ class InventoryController extends Controller
         $inventoryHistory = InventoryHistory::with('product')->orderBy('id','desc')->with('measurement')->get();
         return view('pages.inventory.history', ['currentPage' => 'inventoryHistory','inventoryHistory' => $inventoryHistory]);        
     }
+
+    public function inventoryHistoryWithPaginate(Request $request){
+        $inventoryHistory = InventoryHistory::with('product')->orderBy('id','desc')->with('measurement')->get();
+        return view('pages.inventory.history', ['currentPage' => 'inventoryHistory','inventoryHistory' => $inventoryHistory]);        
+    }
 }

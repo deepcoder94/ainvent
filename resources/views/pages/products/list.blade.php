@@ -30,6 +30,7 @@
                                         <th>Name</th>
                                         <th>Rate</th>
                                         <th>Types</th>
+                                        <th>HSN Code</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -66,6 +67,8 @@
             $("#edit_url").val(edit_url);
             $("#product_name").val(productJson.product_name);
             $("#product_rate").val(productJson.product_rate);
+            $("#product_hsn").val(productJson.product_hsn);
+            
             if (productJson.is_active == 1) {
                 $("#product_active").prop("checked", true);
             } else {
@@ -127,6 +130,8 @@
                     .value,
                 product_rate: form.find((item) => item.name === "product_rate")
                     .value,
+                product_hsn: form.find((item) => item.name === "product_hsn")
+                    .value,                    
                 is_active: $("#product_active").prop("checked") ? 1 : 0,
                 product_measurements: finalData
             };

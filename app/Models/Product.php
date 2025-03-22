@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    protected $fillable = ['product_name','product_rate','is_active'];    
+    protected $fillable = ['product_name','product_rate','is_active','product_hsn'];    
     public function measurements()
     {
         return $this->belongsToMany(Measurement::class, 'product_measurements', 'product_id', 'measurement_id');

@@ -20,6 +20,10 @@
   <script src="{{ asset('public/assets/js/jquery-ui.min.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+  <script>
+    var currentPage = '{{ $currentPage }}';
+  </script>
   <!-- Template Main JS File -->
   <script src="{{ asset('public/assets/js/main.js') }}"></script>
+  
   <script src="{{ asset('public/assets/js/custom.js') }}"></script>
