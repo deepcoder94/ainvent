@@ -18,7 +18,7 @@ function confirmRecord(customer_id){
     let paid_total = $(`#paid_total_${customer_id}`).val();
     paid_total = parseFloat(paid_total)
     
-    let total = invtotal+duetotal;
+    let total = duetotal;
     let newdue = total-paid_total
 
     $(".status_progress_"+customer_id).removeClass('visually-hidden');
