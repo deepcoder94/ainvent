@@ -13,6 +13,7 @@ use App\Http\Controllers\BulkUploadController;
 use App\Http\Controllers\GstInvoiceController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReturnController;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 Route::get('/', [DashboardController::class,'index'])->name('index');
@@ -52,6 +53,8 @@ Route::get('/searchInvoice',[InvoiceController::class,'searchInvoice'])->name('i
 Route::get('/searchCustomer',[CustomerController::class,'searchCustomer'])->name('customer.search');
 
 Route::get('/inventoryHistory',[InventoryController::class,'inventoryHistory'])->name('inventoryHistory');
+Route::get('/inventoryHistoryWithPaginate',[InventoryController::class,'inventoryHistoryWithPaginate'])->name('inventoryHistoryWithPaginate');
+
 Route::get('/download-zip/{file}', [InvoiceController::class, 'downloadZip'])->name('downloadZip');
 
 Route::post('/shipment/create',[ShipmentController::class, 'createShipment'])->name('createShipment');
@@ -84,8 +87,10 @@ Route::get('/loadSingleProduct/{id}',[InvoiceController::class,'loadSingleProduc
 Route::get('/gst/form',[GstInvoiceController::class,'showGstInvoiceForm'])->name('showGstInvoiceForm');
 Route::post('/generateGstInvoice',[GstInvoiceController::class,'generateGstInvoice'])->name('generateGstInvoice');
 Route::get('/addGstProduct/{id}',function(Request $request,$id){
-    return view('pages.generate-gst.add-single-product',compact('id'));
+    $products = Product::get();
+    return view('pages.generate-gst.add-single-product',compact('id','products'));
 })->name('addGstProduct');
 
 Route::get('/payment/history',[PaymentController::class,'paymentHistory'])->name('paymentHistory');
 Route::get('/getSingleInvoicePaymentDetail/{id}',[PaymentController::class,'getSingleInvoicePaymentDetail'])->name('getSingleInvoicePaymentDetail');
+Route::get('/getHsnCodeByProduct/{id}',[ProductController::class,'getHsnCodeByProduct'])->name('getHsnCodeByProduct');

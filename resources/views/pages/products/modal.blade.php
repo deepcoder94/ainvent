@@ -44,6 +44,18 @@
                             />
                         </div>
                         <div class="col-12">
+                            <label for="product_hsn" class="form-label"
+                                >Product GSN</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="product_hsn"
+                                name="product_hsn"
+                                required
+                            />
+                        </div>                        
+                        <div class="col-12">
                             <label for="product_rate" class="form-label"
                                 >Measurement Types</label
                             >

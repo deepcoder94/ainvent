@@ -1,6 +1,9 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Inventory;
+use App\Models\InventoryHistory;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -33,6 +36,7 @@ class GstInvoiceController extends Controller
         $data['invoice_date'] = $formattedDate;
 
 
+
 // Collect and transform product data into a new array
         $products = collect($data['product_description'])->map(function ($description, $index) use ($data) {
             return [
@@ -43,7 +47,11 @@ class GstInvoiceController extends Controller
                 'product_unit_price'    => $data['product_unit_price'][$index],
                 'product_discount'      => $data['product_discount'][$index],
                 'product_taxable_amt'   => $data['product_taxable_amt'][$index],
-                'product_tax_rate'      => $data['product_tax_rate'][$index],
+                'gst_rate'              => $data['gst_rate'][$index],
+                'cess_rate'             => $data['cess_rate'][$index],
+                'state_cess_rate'       => $data['state_cess_rate'][$index],
+                'non_advol_rate'        => $data['non_advol_rate'][$index],
+
                 'product_other_charges' => $data['product_other_charges'][$index],
                 'product_total'         => $data['product_total'][$index],
             ];
@@ -60,50 +68,29 @@ class GstInvoiceController extends Controller
         unset($data['product_unit_price']);
         unset($data['product_discount']);
         unset($data['product_taxable_amt']);
-        unset($data['product_tax_rate']);
+        unset($data['gst_rate']);
+        unset($data['cess_rate']);
+        unset($data['state_cess_rate']);
+        unset($data['non_advol_rate']);
+
         unset($data['product_other_charges']);
         unset($data['product_total']);
+        
+        foreach($data['products'] as $p){
+            $prod = Product::where('product_name',$p['product_description'])->get()->first();
+            $inv = Inventory::where('product_id',$prod->id)->get()->first();
+            $leftStock = $inv->total_stock - $p['product_qty'];
+            $inv->total_stock = $leftStock;
+            $inv->save();
 
-// Output the updated array with new 'products' field
-
-        // $data = [
-        //     'irn' => '359916310f02043428e4a6c9dd418cda67a08c',
-        //     'ack_no' => '182518468020106',
-        //     'ack_date' => '01-03-2025 13:08:00',
-        //     'document_no' => '3059',
-        //     'document_date' => '01-03-2025',
-        //     'supplier' => [
-        //         'name' => 'DEB ENTERPRISE',
-        //         'gstin' => '19GDKPD1370P1Z1',
-        //         'address' => '47/1, DR.C.C.C.ROAD, BHADRESWAR, HOOGHLY 712124, WEST BENGAL',
-        //         'phone' => '9038477792',
-        //     ],
-        //     'recipient' => [
-        //         'name' => 'UNIQUE ENTERPRISE',
-        //         'gstin' => '19AOAPK0062L1Z0',
-        //         'address' => '141/A, SAFUIPARA, BAIDYAPARA, KOLKATA 700078, WEST BENGAL',
-        //     ],
-        //     'items' => [
-        //         [
-        //             'sl_no' => 1,
-        //             'description' => 'KG Mustard Oil 1 ltr Pch-Strong',
-        //             'hsn_code' => '15149920',
-        //             'quantity' => '4000 NOS',
-        //             'unit_price' => '135.710',
-        //             'taxable_amount' => '542856',
-        //             'gst' => '5%',
-        //             'total' => '569998.80',
-        //         ],
-        //     ],
-        //     'summary' => [
-        //         'taxable_amount' => '542856.00',
-        //         'cgst' => '13571.40',
-        //         'sgst' => '13571.40',
-        //         'round_off' => '1.20',
-        //         'total_invoice' => '570000.00',
-        //     ],
-        //     'generated_by' => '19GDKPD1370P1Z1',
-        // ];
+            InventoryHistory::create([
+                'product_id' => $prod->id,
+                'measurement_id' => 1,
+                'stock_out_in'   => $p['product_qty'],
+                'stock_action'  => 'deduct',
+                'buying_price'  => 0
+            ]);
+        }
 
         $pdf = Pdf::loadView('pages.generate-gst.gst-format',$data);
         $pdf->setPaper('A4');

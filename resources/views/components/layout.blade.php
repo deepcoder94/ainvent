@@ -58,6 +58,6 @@
         </main>
 
 
-        <x-footer />
+        <x-footer :currentPage="$currentPage" />
     </body>
 </html>

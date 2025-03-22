@@ -20,6 +20,9 @@ function confirmRecord(customer_id){
     
     let total = invtotal+duetotal;
     let newdue = total-paid_total
+
+    $(".status_progress_"+customer_id).removeClass('visually-hidden');
+    $(".status_pay_"+customer_id).addClass('visually-hidden');
                     
     $.ajax({
         url: updateUrl,  // The URL defined in your routes
@@ -31,8 +34,9 @@ function confirmRecord(customer_id){
         data: { due:newdue,isBeatCustomer:1,invoiceid:invoiceid,paid_total:paid_total,customerid:customerid },
         success: function(response) {
             if(response.success){
-                alert(response.message)
-                location.reload();
+                $(".status_progress_"+customer_id).addClass('visually-hidden');
+                $(".status_paid_"+customer_id).removeClass('visually-hidden');
+                $(".btn_"+customer_id).removeClass('btn-primary').addClass('btn-success');
             }
             else if(!response.success){
                 alert(response.message)
@@ -93,23 +97,53 @@ function searchByInvoice(){
     
 }
 
-function calcDue(){
-    let invoice_total = parseFloat($("#inv_total").html());
-    let dueTotal = parseFloat($("#dueTotal").html());
-    let paid_total = parseFloat($("#paid_total").val());
+function calcDue(id){
+    let invtotal = $(".btn_"+id).data('invoicetotal');
+    let duetotal = $(".btn_"+id).data('duetotal');
+
+    let invoice_total = invtotal;
+    let dueTotal = duetotal;
     
-    let due = (invoice_total+dueTotal) - paid_total;
+    let due = duetotal;
+    let ptotal = $("#paid_total_"+id).val();
+    
+    if(ptotal.length > 0){
+        let paid_total = parseFloat(ptotal);
+        due = dueTotal - paid_total;
+    }    
+    
+    $("#dueTotal"+id).html(due.toFixed(2))
+}
+
+function calcDueSingle(){
+    let invtotal = $("#cnfBtn").data('invoicetotal');
+    let duetotal = $("#cnfBtn").data('duetotal');
+
+    let invoice_total = invtotal;
+    let dueTotal = duetotal;
+    
+    let due = duetotal;
+    let ptotal = $("#paid_total").val();
+    
+    if(ptotal.length > 0){
+        let paid_total = parseFloat(ptotal);
+        due = dueTotal - paid_total;
+    }    
     
     $("#dueTotal").html(due.toFixed(2))
+
 }
 
 function confirmInvRecord(){
     let dueTotal = parseFloat($("#dueTotal").html());
     let customerid = $(`#cnfBtn`).data("customerid");
-    let invoiceid = $(`#cnfBtn`).data("customerid");
+    let invoiceid = $(`#cnfBtn`).data("invoiceid");
     let paid_total = parseFloat($("#paid_total").val());
 
     let updateUrl = '{{ url('paymentsUpdate') }}/'+customerid  
+    $(".status_progress").removeClass('visually-hidden');
+    $(".status_pay").addClass('visually-hidden');
+
     $.ajax({
         url: updateUrl,  // The URL defined in your routes
         type: 'POST',
@@ -120,9 +154,11 @@ function confirmInvRecord(){
         data: { due:dueTotal,isBeatCustomer:0,invoiceid:invoiceid,paid_total:paid_total,customerid:customerid },
         success: function(response) {
             if(response.success){
-                alert(response.message)
-                location.reload();
-                }
+                $(".status_progress").addClass('visually-hidden');
+                $(".status_paid").removeClass('visually-hidden');
+                $("#cnfBtn").removeClass('btn-primary').addClass('btn-success');
+
+            }
             else if(!response.success){
                 alert(response.message)
             }

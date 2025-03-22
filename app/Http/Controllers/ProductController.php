@@ -37,12 +37,14 @@ class ProductController extends Controller
                 'product_name'    => 'required|string|max:255',
                 'product_rate' => 'required|numeric',
                 'is_active'    => 'required',
+                'product_hsn'    => 'required',
             ]);
 
             $product = Product::create([
                 'product_name'    => $request->product_name,
                 'product_rate' => $request->product_rate,
                 'is_active'    => $request->is_active,
+                'product_hsn'    => $request->product_hsn,
             ]);
 
             $product_measurements = $request->product_measurements;
@@ -105,6 +107,7 @@ class ProductController extends Controller
                 'product_name'    => 'required|string|max:255',
                 'product_rate' => 'required',
                 'is_active'    => 'required',
+                'product_hsn'    => 'required',
             ]);
             $resource = Product::findOrFail($id);
 
@@ -112,6 +115,7 @@ class ProductController extends Controller
                 'product_name'    => $request->product_name,
                 'product_rate' => $request->product_rate,
                 'is_active'    => $request->is_active,
+                'product_hsn'    => $request->product_hsn,
             ]);
             $product_measurements = $request->product_measurements;
             ProductMeasurement::where('product_id',$resource->id)->delete();
@@ -151,4 +155,12 @@ class ProductController extends Controller
             'message' => 'Resource deleted successfully.',
         ]);
     }    
+
+    public function getHsnCodeByProduct(Request $request,$id){
+        $product = Product::where('product_name',$id)->get()->first();
+        return response()->json([
+            'data'=>$product,
+            'message' => 'Resource fetched successfully.',
+        ]);        
+    }
 }
