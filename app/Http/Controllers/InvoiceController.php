@@ -177,6 +177,7 @@ class InvoiceController extends Controller
                 ]);
 
                 $newInvoice->invoice_total = $total;
+                $newInvoice->invoice_amount = $total;
                 $newInvoice->save();
 
             $success = true;
@@ -253,5 +254,38 @@ class InvoiceController extends Controller
         }
         $measurement = Measurement::get();
         return view('pages.generate-invoice.generate-product-single',compact('filteredProds','measurement','id'));
+    }
+
+    public function invoiceView(Request $request,$id){
+        $invoice = Invoice::with('customer')->with('beat')->find($id);
+        $products = InvoiceProduct::where('invoice_id', $id)->with('product')->with('measurement')->get();
+
+        $items = [];
+        foreach ($products as $p) {
+            $item = [
+                'qty' => $p->quantity,
+                'type' => $p->measurement->name,
+                'product_description' => $p->product->product_name,
+                'rate' => $p->rate,
+                'amount' => $p->quantity * $p->rate * $p->measurement->quantity
+            ];
+            array_push($items, $item);
+        }
+
+        $total = collect($items)->sum('amount');
+        $grandTotal = $total;
+        $customer = $invoice->customer;
+        $invoice_number = 'INV-' . $invoice->id;
+        $date = \Carbon\Carbon::parse($invoice->created_at)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s');
+        $beat_name = $invoice->beat->beat_name;
+        $distributor = Distributor::get()->first();
+
+
+        $data = compact('items', 'total', 'grandTotal', 'customer', 'invoice_number', 'date', 'beat_name', 'distributor');
+        $finalArray[] = $data;
+
+        $invoicesArray = ['invoices'=>$finalArray];
+        return view('pages.invoices.invoice-pdf',$invoicesArray);
+
     }
 }

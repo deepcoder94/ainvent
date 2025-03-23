@@ -50,7 +50,7 @@
     
     </head>
     
-    <body>
+    <body class="{{ $currentPage=='gstInvoice'?'toggle-sidebar':'' }}">
         <x-header :currentPage="$currentPage" />
         <x-sidebar :currentPage="$currentPage" />
         <main id="main" class="main">

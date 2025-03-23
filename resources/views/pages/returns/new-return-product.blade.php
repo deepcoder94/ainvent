@@ -8,7 +8,7 @@
             <select name="invoiceProduct[]" id="invproducts" class="form-control" onchange="getMaxQty(event,'{{$count}}')">
                 <option value="">Select</option>
                 @foreach ($products as $p)
-                    <option value="{{ $p->id }}" data-maxqty='{{ $p->pivot->quantity }}'>{{ $p->product_name }}</option>
+                    <option value="{{ $p->id }}" data-maxqty='{{ $p->pivot->quantity * $measurements->quantity }}'>{{ $p->product_name }}</option>
                 @endforeach
             </select>                                                                                        
         </div>
@@ -20,6 +20,7 @@
             class="form-label"
             >Qty</label>
             <input type="text" name="quantity[]" id="qty_{{$count}}" class="form-control" onkeyup="checkMaxQty('{{$count}}')">
+            <span style="color:red;font-size:13px;font-weight:600" id="max_qty_{{$count}}">Max Qty</span>
         </div>
     </div>
     <div class="col-lg-2">

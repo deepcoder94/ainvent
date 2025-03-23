@@ -6,6 +6,7 @@
         recordIndex=1;
         let invoiceId = $("#invoiceId").val();
         let url = '{{ url('getProductsByInvoice') }}/'+invoiceId+'/'+recordIndex;
+        let viewUrl = '{{ url('invoiceView') }}/'+invoiceId
         let options = [];
         $.ajax({
                 url: url,  // The URL defined in your routes
@@ -15,6 +16,21 @@
                 },
                 success: function(response) {
                     $("#products").html(response)
+
+                    $.ajax({
+                        url: viewUrl,  // The URL defined in your routes
+                        type: 'GET',
+                        headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')  // CSRF Token
+                        },
+                        success: function(res){
+                            $("#invoice_view").html(res)                            
+                        },
+                        error: function(xhr, status, error){
+
+                        }
+                    });
+
                 },
                 error: function(xhr, status, error) {
                     alert(error.message)
@@ -79,10 +95,10 @@
                 .value,
             products: finalData,
         };
-        // if(!isFormValid){
-        //     alert('Invalid inputs. please check once');
-        //     return;
-        // }
+        if(!isFormValid){
+            alert('Invalid inputs. please check once');
+            return;
+        }
         let url ='{{ url('/submitReturn') }}';
         $.ajax({
                 url: url,  // The URL defined in your routes
@@ -112,20 +128,22 @@
         let sel = document.getElementById('invproducts');     
         let selected = sel.options[sel.selectedIndex];
         var extra = selected.getAttribute('data-maxqty');
-        // $("#qty_"+index).attr("data-maxqty",extra);
-        // $("#max_qty_span"+index).html('Max Qty: '+extra);
+
+        $("#qty_"+index).attr("data-maxqty",extra);
+        $("#max_qty_"+index).html('Max Qty: '+extra);
         
     }
 
     function checkMaxQty(index){
-    //     let inp_qty = parseFloat($("#qty_"+index).val());
-    //     let max_qty = parseFloat($("#qty_"+index).attr("data-maxqty"));
-    //     if(inp_qty<max_qty){
-    //         isFormValid=true
-    //     }
-    //     if(inp_qty>max_qty){
-    //         isFormValid=false
-    //     }
+
+        let inp_qty = parseFloat($("#qty_"+index).val());
+        let max_qty = parseFloat($("#qty_"+index).attr("data-maxqty"));
+        if(inp_qty<=max_qty){
+            isFormValid=true
+        }
+        if(inp_qty>max_qty){
+            isFormValid=false
+        }
         
     }
 

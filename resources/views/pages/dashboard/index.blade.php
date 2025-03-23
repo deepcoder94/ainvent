@@ -1,5 +1,4 @@
-<!-- resources/views/tasks.blade.php -->
- 
+
 <x-layout :currentPage="$currentPage">
     <section class="section dashboard">
         <div class="row">

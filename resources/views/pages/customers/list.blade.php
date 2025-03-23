@@ -53,7 +53,6 @@
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Beat Name</th>
-                                    <th>Due</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>

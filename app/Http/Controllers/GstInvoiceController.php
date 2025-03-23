@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\GstInvoice;
+use App\Models\GstInvoiceProduct;
 use App\Models\Inventory;
 use App\Models\InventoryHistory;
 use App\Models\Product;
@@ -47,10 +49,10 @@ class GstInvoiceController extends Controller
                 'product_unit_price'    => $data['product_unit_price'][$index],
                 'product_discount'      => $data['product_discount'][$index],
                 'product_taxable_amt'   => $data['product_taxable_amt'][$index],
-                'gst_rate'              => $data['gst_rate'][$index],
-                'cess_rate'             => $data['cess_rate'][$index],
-                'state_cess_rate'       => $data['state_cess_rate'][$index],
-                'non_advol_rate'        => $data['non_advol_rate'][$index],
+                'gst_rate'              => $data['product_gst_rate'][$index],
+                'cess_rate'             => $data['product_cess_rate'][$index],
+                'state_cess_rate'       => $data['product_state_cess_rate'][$index],
+                'non_advol_rate'        => $data['product_non_advol_rate'][$index],
 
                 'product_other_charges' => $data['product_other_charges'][$index],
                 'product_total'         => $data['product_total'][$index],
@@ -68,14 +70,44 @@ class GstInvoiceController extends Controller
         unset($data['product_unit_price']);
         unset($data['product_discount']);
         unset($data['product_taxable_amt']);
-        unset($data['gst_rate']);
-        unset($data['cess_rate']);
-        unset($data['state_cess_rate']);
-        unset($data['non_advol_rate']);
+        unset($data['product_gst_rate']);
+        unset($data['product_cess_rate']);
+        unset($data['product_state_cess_rate']);
+        unset($data['product_non_advol_rate']);
 
         unset($data['product_other_charges']);
         unset($data['product_total']);
         
+        $lastRec = GstInvoice::create([
+            'supplier_details'=>json_encode([
+                'supplier_name'=>$data['supplier_name'],
+                'supplier_gstin'=>$data['supplier_gstin'],
+                'supplier_address'=>$data['supplier_address'],
+                'supplier_phone'=>$data['supplier_phone']
+                ]
+            ),
+            'receipent_details'=>json_encode([
+                'recepent_name'=>$data['recepent_name'],
+                'recepent_gstin'=>$data['recepent_gstin'],
+                'recepent_address'=>$data['recepent_address'],
+                'recepent_phone'=>$data['recepent_phone']
+            ]),
+            'invoice_number'=>$data['invoice_no'],
+            'invoice_date'=>$data['invoice_date'],
+            'gst_breakup'=>json_encode([
+                'gst_cgst'=>$data['gst_cgst'],
+                'gst_sgst'=>$data['gst_sgst'],
+                'gst_igst'=>$data['gst_igst'],
+                'gst_cess'=>$data['gst_cess'],
+                'gst_state_cess'=>$data['gst_state_cess']
+            ]),
+            'taxable_amount'=>$data['gst_taxable_amt'],
+            'discount'=>$data['gst_discount'],
+            'other_charges'=>$data['gst_other_charges'],
+            'round_off_amount'=>$data['gst_roundoff'],
+            'total_invoice_amount'=>$data['gst_total_inv']
+        ]);
+
         foreach($data['products'] as $p){
             $prod = Product::where('product_name',$p['product_description'])->get()->first();
             $inv = Inventory::where('product_id',$prod->id)->get()->first();
@@ -90,6 +122,24 @@ class GstInvoiceController extends Controller
                 'stock_action'  => 'deduct',
                 'buying_price'  => 0
             ]);
+
+            GstInvoiceProduct::create([
+                'gst_invoice_id'=>$lastRec->id,
+                'product_name'=>$p['product_description'],
+                'hsn_code'=>$p['product_code'],
+                'quantity'=>$p['product_qty'],
+                'unit_price'=>$p['product_unit_price'],
+                'taxable_amount'=>$p['product_taxable_amt'],
+                'gst_breakup'=>json_encode([
+                    'gst_rate'=>$p['gst_rate'],
+                    'cess_rate'=>$p['cess_rate'],
+                    'state_cess_rate'=>$p['state_cess_rate'],
+                    'non_advol_rate'=>$p['non_advol_rate']
+                ]),
+                'other_charges'=>$p['product_other_charges'],
+                'total'=>$p['product_total']
+            ]);
+            
         }
 
         $pdf = Pdf::loadView('pages.generate-gst.gst-format',$data);
@@ -104,5 +154,22 @@ class GstInvoiceController extends Controller
         return response()->json([
             'zipUrl' => route('downloadZip', ['file' => $zipFileName])
         ]);
+    }
+
+    public function addGstInvoiceFormProduct(Request $request,$id){
+        $products = Product::get();
+        return view('pages.generate-gst.add-single-product',compact('products','id'));
+    }
+
+    public function list(Request $request){
+        $currentPage = 'gstInvoiceList';
+        $gst_invoices = GstInvoice::with('gst_invoice_products')->get()->toArray();
+        foreach($gst_invoices as $index => $i){
+            $gst_invoices[$index]['supplier_details'] = json_decode($i['supplier_details'],true);
+            $gst_invoices[$index]['receipent_details'] = json_decode($i['receipent_details'],true);
+            $gst_invoices[$index]['gst_breakup'] = json_decode($i['gst_breakup'],true);
+
+        }
+        return view('pages.gst-invoices.list',compact('currentPage','gst_invoices'));
     }
 }

@@ -36,4 +36,16 @@ class DashboardController extends Controller
         })->toArray();
         return view('pages.dashboard.index',compact('currentPage','beatsSum','total_pay'));
     }
+
+    public function salesList(Request $request){
+        $currentPage = 'salesList';
+        return view('pages.dashboard.sales-list',compact('currentPage'));
+    }
+    
+    public function profitList(Request $request){
+        $currentPage = 'profitList';
+        return view('pages.dashboard.profit-list',compact('currentPage'));
+
+    }
+
 }
