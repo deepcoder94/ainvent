@@ -24,7 +24,6 @@ style="display: none"
                             <th>Item Description</th>
                             <th>HSN Code</th>
                             <th>Qty</th>
-                            <th>Unit</th>
                             <th>Unit Price</th>
                             <th>Discount</th>
                             <th>Taxable Amt</th>

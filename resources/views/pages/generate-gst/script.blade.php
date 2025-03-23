@@ -3,11 +3,24 @@
     var gstProducts = [];
     function showProductDetail() {
         $("#gstProductsForm")[0].reset();
-        index = 0;
         $("#gstproduct-tbody").html("");
         $(".sel2input").select2()    
-
-        $("#ExtralargeModal").modal("show");
+        ++index;
+        let url = "{{ url('addGstInvoiceFormProduct') }}/" + index;
+        $.ajax({
+            url: url, // The URL defined in your routes
+            type: "GET",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                    "content"
+                ), // CSRF Token
+            },
+            success: function (response) {
+                $("#allProductstd").append(response)
+            },
+            error: function (xhr, status, error) {},
+        });
+        // $("#ExtralargeModal").modal("show");
     }
 
     function addGstProduct() {
@@ -29,9 +42,10 @@
     }
 
     function submitGstProductForm() {
-        let formValues = $("#gstProductsForm").serializeArray();
+        let formValues = $("#gst_invoice_form").serializeArray();
+        
         let groupedValues = {};
-
+        gstProducts = []
         // Group the values by name
         formValues.forEach(function (field) {
             if (!groupedValues[field.name]) {
@@ -41,26 +55,27 @@
         });
 
         let finalData = [];
+        
 
-        let length = groupedValues["code[]"].length; // Assuming all fields have the same length
+        let length = groupedValues["product_code[]"].length; // Assuming all fields have the same length
 
         // Create key-value pair objects for each product
         for (let i = 0; i < length; i++) {
             finalData.push({
-                description: groupedValues["description[]"][i],
-                code: groupedValues["code[]"][i],
-                qty: groupedValues["qty[]"][i],
-                unit: groupedValues["unit[]"][i],
-                unit_price: groupedValues["unit_price[]"][i],
-                discount: groupedValues["discount[]"][i],
-                taxable_amt: groupedValues["taxable_amt[]"][i],
-                gst_rate: groupedValues["gst_rate[]"][i],
-                cess_rate: groupedValues["cess_rate[]"][i],
-                state_cess_rate: groupedValues["state_cess_rate[]"][i],
-                non_advol_rate: groupedValues["non_advol_rate[]"][i],
+                product_description: groupedValues["product_description[]"][i],
+                product_code: groupedValues["product_code[]"][i],
+                product_qty: groupedValues["product_qty[]"][i],
+                product_unit: groupedValues["product_unit[]"][i],
+                product_unit_price: groupedValues["product_unit_price[]"][i],
+                product_discount: groupedValues["product_discount[]"][i],
+                product_taxable_amt: groupedValues["product_taxable_amt[]"][i],
+                product_gst_rate: groupedValues["product_gst_rate[]"][i],
+                product_cess_rate: groupedValues["product_cess_rate[]"][i],
+                product_state_cess_rate: groupedValues["product_state_cess_rate[]"][i],
+                product_non_advol_rate: groupedValues["product_non_advol_rate[]"][i],
 
-                other_charges: groupedValues["other_charges[]"][i],
-                total: groupedValues["total[]"][i],
+                product_other_charges: groupedValues["product_other_charges[]"][i],
+                product_total: groupedValues["product_total[]"][i],
             });
         }
 
@@ -77,10 +92,10 @@
         
         gstProducts.map((p)=>{
             
-            total_taxable_amt += parseFloat(p.taxable_amt)            
-            total_gst += (parseFloat(p.gst_rate) / 100) * parseFloat(p.taxable_amt)
-            grandtotal += parseFloat(p.total)
-            other_charge += parseFloat(p.other_charges)
+            total_taxable_amt += parseFloat(p.product_taxable_amt)            
+            total_gst += (parseFloat(p.product_gst_rate) / 100) * parseFloat(p.product_taxable_amt)
+            grandtotal += parseFloat(p.product_total)
+            other_charge += parseFloat(p.product_other_charges)
 
             // let taxable_amt = p.qty * p.unit_price;
 
@@ -91,72 +106,18 @@
         $("#gst_taxable_amt").val(total_taxable_amt);
         $("#gst_cgst").val((total_gst/2).toFixed(2));
         $("#gst_sgst").val((total_gst/2).toFixed(2));
-        $("#gst_total_inv").val(grandtotal);
-        $("#gst_other_charges").val(other_charge);
-
+        let roundamt = 0;
+        roundamt = parseFloat($("#gst_roundoff").val());
+        $("#gst_total_inv").val((grandtotal+roundamt).toFixed(3));
+        $("#gst_other_charges").val(other_charge.toFixed(3));
         
-        $("#gst_calc_tbody").css('display','contents');
-
-
-        let html = "";
-        gstProducts.map((p, i) => {
-            html += `
-            <tr id="gst_list_product_${i}">
-                <td>
-                    <input type="text" class="form-control" name="product_description[]" value="${p.description}" />
-                </td>
-                <td>
-                    <input type="text" class="form-control" name="product_code[]" value="${p.code}"></td>
-                <td>
-                    <input type="text" class="form-control" name="product_qty[]" value="${p.qty}" />
-                </td>
-                <td>
-                    <input type="text" class="form-control" name="product_unit[]" value="${p.unit}" />
-                </td>
-                <td>
-                    <input type="text" class="form-control" name="product_unit_price[]" value="${p.unit_price}" />
-                </td>
-                <td>
-                    <input type="text" class="form-control" name="product_discount[]" value="${p.discount}" />                    
-                </td>
-                <td>
-                    <input type="text" class="form-control" name="product_taxable_amt[]" value="${p.taxable_amt}" />                    
-                </td>
-                <td>
-                    <div class="row">
-                        <div class="col-lg-6">
-                    <input type="text" class="form-control" name="gst_rate[]" value="${p.gst_rate}" />                    
-                    <input type="text" class="form-control" name="cess_rate[]" value="${p.cess_rate}" />                                                                
-                        </div>
-                        <div class="col-lg-6">
-                    <input type="text" class="form-control" name="state_cess_rate[]" value="${p.state_cess_rate}" />                    
-                    <input type="text" class="form-control" name="non_advol_rate[]" value="${p.non_advol_rate}" />                                                                
-                        
-                        </div>
-                    </div>
-
-                </td>
-                <td>
-                    <input type="text" class="form-control" name="product_other_charges[]" value="${p.other_charges}" />                    
-                </td>
-                <td>
-                    <input type="text" class="form-control" name="product_total[]" value="${p.total}" />                    
-                </td>
-                <td>
-                    <span onclick="removeGstProductList('${i}')">
-                        <i class="bi bi-trash" style="color: red; font-size: 23px;cursor:pointer"></i>
-                    </span>
-                </td>
-            </tr>
-            `;
-        });
-        $("#allProductstd").html(html);
-        $("#ExtralargeModal").modal('hide');
     }
 
     function removeGstProduct(i) {
         $("#gst_row_" + i).remove();
         i--;
+        submitGstProductForm();
+
     }
 
     function removeGstProductList(i) {
@@ -243,5 +204,11 @@
         $(`#taxable_amt_${id}`).val(taxable_amt.toFixed(3))
         $(`#total_${id}`).val(gtotal.toFixed(3))
 
+        calculateGstTotal();
+
+    }
+
+    function calculateGstTotal(){
+        submitGstProductForm();
     }
 </script>

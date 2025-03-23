@@ -18,6 +18,8 @@ use Illuminate\Http\Request;
 
 Route::get('/', [DashboardController::class,'index'])->name('index');
 Route::get('/dashboard', [DashboardController::class,'index'])->name('dashboard');
+Route::get('/sales/list', [DashboardController::class,'salesList'])->name('salesList');
+Route::get('/profit/list', [DashboardController::class,'profitList'])->name('profitList');
 
 Route::resources([
     'distributor'=>DistributorController::class,
@@ -91,6 +93,20 @@ Route::get('/addGstProduct/{id}',function(Request $request,$id){
     return view('pages.generate-gst.add-single-product',compact('id','products'));
 })->name('addGstProduct');
 
+Route::get('/addGstInvoiceFormProduct/{id}',[GstInvoiceController::class,'addGstInvoiceFormProduct'])->name('addGstInvoiceFormProduct');
+
 Route::get('/payment/history',[PaymentController::class,'paymentHistory'])->name('paymentHistory');
 Route::get('/getSingleInvoicePaymentDetail/{id}',[PaymentController::class,'getSingleInvoicePaymentDetail'])->name('getSingleInvoicePaymentDetail');
+Route::get('/searchPayHistory/{id}',[PaymentController::class,'searchPayHistory'])->name('searchPayHistory');
+
 Route::get('/getHsnCodeByProduct/{id}',[ProductController::class,'getHsnCodeByProduct'])->name('getHsnCodeByProduct');
+
+Route::get('/invoiceView/{id}',[InvoiceController::class,'invoiceView'])->name('invoiceView');
+
+Route::get('/gstinvoice/list',[GstInvoiceController::class,'list'])->name('gstInvoiceList');
+
+// // Daily Sales
+// Route::get('/sales');
+
+// // Profits
+// Route::get('/profits');

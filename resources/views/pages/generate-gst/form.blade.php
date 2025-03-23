@@ -103,16 +103,13 @@
                         >
                             Add Products
                         </button>
+                        <form action="#" method="POST" id="gstProductsForm">
 
                         <table class="table table-bordered mt-3">
                             <thead>
                                 <tr>
-                                    <th>Item Description</th>
-                                    <th>HSN Code</th>
-                                    <th>Qty</th>
-                                    <th>Unit</th>
-                                    <th>Unit Price</th>
-                                    <th>Discount</th>
+                                    <th>Description |<br/>HSN Code</th>
+                                    <th>Qty | <br/>Unit Price</th>
                                     <th>Taxable Amt</th>
                                     <th>Tax Rate (GST,CESS<br/>State, Non Advol.)</th>
                                     <th>Other Charges</th>
@@ -122,17 +119,15 @@
                             </thead>
                             <tbody id="allProductstd"></tbody>
                         </table>
-
+                        </form>
                         <h6 class="card-title">GST Information</h6>
                         <table class="table table-bordered mt-3">
                             <thead>
                                 <tr>
                                     <th>Tax'ble Amt</th>
-                                    <th>CGST Amt</th>
-                                    <th>SGST Amt</th>
+                                    <th>CGST Amt | <br/>SGST Amt</th>
                                     <th>IGST Amt</th>
-                                    <th>CESS Amt</th>
-                                    <th>State CESS</th>
+                                    <th>CESS Amt | <br/>State CESS</th>
                                     <th>Discount</th>
                                     <th>Other Charges</th>
                                     <th>Round off Amt</th>
@@ -140,24 +135,20 @@
                                 </tr>    
                             </thead>
                             <tbody>
-                                <tr id="gst_calc_tbody" style="display: none;">
+                                <tr id="gst_calc_tbody">
                                     <td>
                                         <input type="text" name="gst_taxable_amt" id="gst_taxable_amt" class="form-control" value="0.00">
                                     </td>
                                     <td>
                                         <input type="text" name="gst_cgst" id="gst_cgst" class="form-control" value="0.00">
-                                    </td>
-                                    <td>
-                                        <input type="text" name="gst_sgst" id="gst_sgst" class="form-control" value="0.00">
+                                        <input type="text" name="gst_sgst" id="gst_sgst" class="form-control mt-1" value="0.00">
                                     </td>
                                     <td>
                                         <input type="text" name="gst_igst" id="gst_igst" class="form-control" value="0.00">
                                     </td>
                                     <td>
                                         <input type="text" name="gst_cess" id="gst_cess" class="form-control" value="0.00">
-                                    </td>
-                                    <td>
-                                        <input type="text" name="gst_state_cess" id="gst_state_cess" class="form-control" value="0.00">
+                                        <input type="text" name="gst_state_cess" id="gst_state_cess" class="form-control mt-1" value="0.00">
                                     </td>
                                     <td>
                                         <input type="text" name="gst_discount" id="gst_discount" class="form-control" value="0.00">
@@ -166,7 +157,7 @@
                                         <input type="text" name="gst_other_charges" id="gst_other_charges" class="form-control" value="0.00">
                                     </td>
                                     <td>
-                                        <input type="text" name="gst_roundoff" id="gst_roundoff" class="form-control" value="0.00">
+                                        <input type="text" name="gst_roundoff" id="gst_roundoff" class="form-control" value="0.00" onkeyup="calculateGstTotal()">
                                     </td>
                                     <td>
                                         <input type="text" name="gst_total_inv" id="gst_total_inv" class="form-control" value="0.00">

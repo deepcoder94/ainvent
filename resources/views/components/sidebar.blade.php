@@ -8,6 +8,19 @@
           <span>Dashboard</span>
         </a>
       </li><!-- End F.A.Q Page Nav -->
+      <li class="nav-item">
+        <a class="nav-link {{ $currentPage=='salesList'?'':'collapsed' }}" href="{{ route('salesList') }}">
+          <i class="bi bi-grid"></i>
+          <span>Sales List</span>
+        </a>
+      </li><!-- End F.A.Q Page Nav -->      
+      <li class="nav-item">
+        <a class="nav-link {{ $currentPage=='profitList'?'':'collapsed' }}" href="{{ route('profitList') }}">
+          <i class="bi bi-grid"></i>
+          <span>Profit List</span>
+        </a>
+      </li><!-- End F.A.Q Page Nav -->      
+
           <li class="nav-item">
             <a class="nav-link {{ $currentPage=='invoicesCreate'?'':'collapsed' }}" href="{{ route('invoiceGenerate') }}">
               <i class="bi bi-clipboard-plus"></i>
@@ -27,7 +40,12 @@
               <span>Invoice List</span>
             </a>
           </li><!-- End F.A.Q Page Nav -->
-        
+          <li class="nav-item">
+            <a class="nav-link {{ $currentPage=='gstInvoiceList'?'':'collapsed' }}" href="{{ route('gstInvoiceList') }}">
+              <i class="bi bi-clipboard-data"></i>
+              <span>GST Invoice List</span>
+            </a>
+          </li><!-- End F.A.Q Page Nav -->        
       <li class="nav-item">
         <a class="nav-link {{ $currentPage=='shipmentList'?'':'collapsed' }}" href="{{ route('shipmentList') }}">
           <i class="bi bi-receipt"></i>

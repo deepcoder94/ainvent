@@ -23,15 +23,24 @@
                                             <option value="{{ $i->id }}">{{ $i->invoice_number }}</option>                                            
                                         @endforeach
                                     </select>
-                                                                                        
                                 </div>
                             </div>
                             <div class="col-lg-9">
                                 <div id="products"></div>
                             </div>
                         </div>
+
                     </div>
                 </form>
+
+                </div>
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Invoice View</h5>
+                            <div id="invoice_view"></div>    
+                        </div>
+                    </div>
 
                 </div>
             </div>

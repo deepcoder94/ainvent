@@ -26,7 +26,7 @@ class ReturnController extends Controller
 
     public function getInvoiceProducts(Request $request,$id,$index){
         $invoices = Invoice::where('id',$id)->with('invoiceproducts')->with('invoicemeasurements')->get()->first();
-        return view('pages.returns.new-return-product',['products'=>$invoices->invoiceproducts,'count'=>$index,'measurements'=>$invoices->invoicemeasurements]);
+        return view('pages.returns.new-return-product',['products'=>$invoices->invoiceproducts,'count'=>$index,'measurements'=>$invoices->invoicemeasurements[0]]);
     }
 
     public function submitReturn(Request $request){
@@ -60,11 +60,13 @@ class ReturnController extends Controller
                 // Diff between due and return
                 if($pay->invoice_total > 0){
                     $pay->invoice_total -= ($totalqty * $rate);
+                    $invoiceI->invoice_amount -=  ($totalqty * $rate);
                 }        
                 else{
                     $pay->total_due -= ($totalqty * $rate);
                 }
                 $pay->save();
+                $invoiceI->save();
     
     
                 // invoice product delete
