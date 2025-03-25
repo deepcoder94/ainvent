@@ -14,23 +14,36 @@
         clearInputErrors('invalid_beat');
         let beatId = parseInt($("#beat_id").val());
 
-        let customers = $("#customers").val();
-        let customerJson = JSON.parse(customers);
-        const filteredData = customerJson.filter(
-            (item) => item.beat_id === beatId
-        );
+        let url = '{{ url('getCustomersByBeat') }}/'+beatId;
+        $.ajax({
+            url: url, // The URL defined in your routes
+            type: "GET",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                    "content"
+                ), // CSRF Token
+            },
+            success: function (response) {
+                let customers = response.customers
 
-        let options = `<option value="">Choose</option>`;
-        if (filteredData.length > 0) {
-            let optionsfiltered = filteredData
-                .map((item) => {
-                    return `<option value="${item.id}">${item.customer_name}</option>`;
-                })
-                .join("");
+                let options = `<option value="">Choose</option>`;
+                if (customers.length > 0) {
+                    let optionsfiltered = customers
+                        .map((item) => {
+                            return `<option value="${item.id}">${item.customer_name}</option>`;
+                        })
+                        .join("");
 
-            options = options.concat(optionsfiltered);
-        }
-        $("#customer_id").html(options);
+                    options = options.concat(optionsfiltered);
+
+                }                
+                $("#customer_id").html(options);
+
+            },
+            error: function (xhr, status, error) {                
+            },
+        });        
+
     }
 
     function showAddProductModal() {
@@ -59,41 +72,63 @@
     }
 
     function getProductTypes(event,id){
-        let products = $("#products").val();
-        let productJson = JSON.parse(products);
         let selectedProduct = event.target.value;
-        let measurements = $("#measurements").val();
-        let measurementsJson = JSON.parse(measurements);
+
+        let url = '{{ url('getMeasurementsByProduct') }}/'+selectedProduct;
+        $.ajax({
+            url: url, // The URL defined in your routes
+            type: "GET",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                    "content"
+                ), // CSRF Token
+            },
+            success: function (response) {
+                let measu = response.data;
+                let meas_html = $(`#meas_${id}`);
+                if (measu.length > 0) {
+                    let meahtml = '';
+                    let selectProdcts = measu.map((mea) => {
+                        meahtml += `<option value="${mea.id}">${mea.name}</option>`;
+                    });
+                    meas_html.html(meahtml);
+                    meas_html.trigger('change');
+                }
+                
+            },
+            error: function (xhr, status, error) {                
+                // alert(xhr.responseJSON.message);
+            },
+        });
+
+        
+        // let products = $("#products").val();
+        // let productJson = JSON.parse(products);
+        // let measurements = $("#measurements").val();
+        // let measurementsJson = JSON.parse(measurements);
         
         
-        let pro = productJson.filter((p)=>{
-            return p.id == selectedProduct
-        })
-        let finalMeas = [];
-        if(pro[0].measurements.length > 0){
-            let ids = pro[0].measurements.map((m)=>{
-                return m.id
-            });
+        // let pro = productJson.filter((p)=>{
+        //     return p.id == selectedProduct
+        // })
+        // console.log(pro[0]);
+        
+        // let finalMeas = [];
+        // if(pro[0].measurements.length > 0){
+        //     let ids = pro[0].measurements.map((m)=>{
+        //         return m.id
+        //     });
             
             
-            let ms = measurementsJson.filter((m)=>{
-                return ids.includes(m.id)
-            })
-            finalMeas = ms
-        }      
-        else{
-            finalMeas = measurementsJson
-        }    
+        //     let ms = measurementsJson.filter((m)=>{
+        //         return ids.includes(m.id)
+        //     })
+        //     finalMeas = ms
+        // }      
+        // else{
+        //     finalMeas = measurementsJson
+        // }    
         
-        let meas_html = $(`#meas_${id}`);
-        if (finalMeas.length > 0) {
-            let meahtml = '';
-            let selectProdcts = finalMeas.map((mea) => {
-                meahtml += `<option value="${mea.id}">${mea.name}</option>`;
-            });
-            meas_html.html(meahtml);
-            meas_html.trigger('change');
-        }
 
     }
 
@@ -172,6 +207,7 @@
                 measurement_id: groupedValues["measurement_id[]"][i],
                 qty: groupedValues["qty[]"][i],
                 rate: groupedValues["rate[]"][i],
+                minrate: groupedValues["minrate[]"][i],
             });
         }
         isValid=true
@@ -228,6 +264,7 @@
     }
 
     function getMaxQty(id){
+
         // selected product
         let selected_pro = $("#product_slct_"+id).val();
         
@@ -235,35 +272,72 @@
         let selected_type = $("#meas_"+id).val();
 
 
-        // selected qty
-
-        let products = $("#products").val();
-        let productJson = JSON.parse(products);
-        
-        let prod =productJson.filter((j)=>{
-            return j.id == selected_pro
-        })
-        
-        let totalstock = prod[0].inventory.total_stock
-
-        let minrate = prod[0].product_rate;
-        $("#min_rate_span"+id).html('Min Rate: '+minrate);
-
-        let type_qty = prod[0].measurements.filter((m)=>{
-            return m.id == selected_type
-        })
-        type_qty = type_qty[0].quantity
-
-        let maxQty = (totalstock/type_qty).toFixed(2);
-
-        $("#max_qty_span"+id).html('Max Quantity: '+maxQty)
-        $("#qty_"+id).attr({
-            'min':0,
-            'max':(totalstock/type_qty),
-            'step':0.1
+        let url = '{{ url('getMaxQtyByTypeAndProduct') }}/'+selected_type+'/'+selected_pro;
+        $.ajax({
+            url: url, // The URL defined in your routes
+            type: "GET",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                    "content"
+                ), // CSRF Token
+            },
+            success: function (response) {
+                console.log(response);
+                let minrate = response.min_rate
+                let maxQty = response.max_qty
+                $("#min_rate_span"+id).html('Min Rate: '+minrate);
+                $("#max_qty_span"+id).html('Max Quantity: '+maxQty)
+                $("#qty_"+id).attr({
+                    'min':0,
+                    'max':maxQty,
+                    'step':0.1
+                });
+                $("#qty_"+id).attr('data-maxqty',maxQty);
+                $("#qty_"+id).attr('data-minrate',minrate);
+                $("#minrate_"+id).val(minrate)
+                
+                // let measu = response.data;
+                // let meas_html = $(`#meas_${id}`);
+                // if (measu.length > 0) {
+                //     let meahtml = '';
+                //     let selectProdcts = measu.map((mea) => {
+                //         meahtml += `<option value="${mea.id}">${mea.name}</option>`;
+                //     });
+                //     meas_html.html(meahtml);
+                //     meas_html.trigger('change');
+                // }
+                
+            },
+            error: function (xhr, status, error) {                
+                // alert(xhr.responseJSON.message);
+            },
         });
-        $("#qty_"+id).attr('data-maxqty',maxQty);
-        $("#qty_"+id).attr('data-minrate',minrate);
+
+
+
+
+        // // selected qty
+
+        // let products = $("#products").val();
+        // let productJson = JSON.parse(products);
+        
+        // let prod =productJson.filter((j)=>{
+        //     return j.id == selected_pro
+        // })
+
+        
+        
+        // let totalstock = prod[0].inventory.total_stock
+
+        // let minrate = prod[0].inventory.buying_price;
+
+        // let type_qty = prod[0].measurements.filter((m)=>{
+        //     return m.id == selected_type
+        // })
+        // type_qty = type_qty[0].quantity
+
+        // let maxQty = (totalstock/type_qty).toFixed(2);
+
                 
     }
 

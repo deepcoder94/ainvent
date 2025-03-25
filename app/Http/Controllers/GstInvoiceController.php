@@ -5,6 +5,7 @@ use App\Models\GstInvoice;
 use App\Models\GstInvoiceProduct;
 use App\Models\Inventory;
 use App\Models\InventoryHistory;
+use App\Models\InvoiceProfit;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
@@ -47,6 +48,7 @@ class GstInvoiceController extends Controller
                 'product_qty'           => $data['product_qty'][$index],
                 'product_unit'          => $data['product_unit'][$index],
                 'product_unit_price'    => $data['product_unit_price'][$index],
+                'product_min_rate'      => $data['product_min_rate'][$index],
                 'product_discount'      => $data['product_discount'][$index],
                 'product_taxable_amt'   => $data['product_taxable_amt'][$index],
                 'gst_rate'              => $data['product_gst_rate'][$index],
@@ -68,6 +70,7 @@ class GstInvoiceController extends Controller
         unset($data['product_qty']);
         unset($data['product_unit']);
         unset($data['product_unit_price']);
+        unset($data['product_min_rate']);
         unset($data['product_discount']);
         unset($data['product_taxable_amt']);
         unset($data['product_gst_rate']);
@@ -108,6 +111,8 @@ class GstInvoiceController extends Controller
             'total_invoice_amount'=>$data['gst_total_inv']
         ]);
 
+        $profit = 0;
+
         foreach($data['products'] as $p){
             $prod = Product::where('product_name',$p['product_description'])->get()->first();
             $inv = Inventory::where('product_id',$prod->id)->get()->first();
@@ -122,6 +127,12 @@ class GstInvoiceController extends Controller
                 'stock_action'  => 'deduct',
                 'buying_price'  => 0
             ]);
+
+            // Profit
+            // SP-CP * quantity
+            $sp = $p['product_unit_price'];
+            $cp = $p['product_min_rate'];
+            $profit += ($sp-$cp) * $p['product_qty'];
 
             GstInvoiceProduct::create([
                 'gst_invoice_id'=>$lastRec->id,
@@ -141,6 +152,14 @@ class GstInvoiceController extends Controller
             ]);
             
         }
+
+        InvoiceProfit::create([
+            'invoice_number'=>$data['invoice_no'],
+            'invoice_id'=>0,
+            'gst_invoice_id'=>$lastRec->id,
+            'is_gst_invoice'=>1,
+            'profit_amount'=>$profit
+        ]);
 
         $pdf = Pdf::loadView('pages.generate-gst.gst-format',$data);
         $pdf->setPaper('A4');
@@ -171,5 +190,24 @@ class GstInvoiceController extends Controller
 
         }
         return view('pages.gst-invoices.list',compact('currentPage','gst_invoices'));
+    }
+
+    public function getMaxQtyByTypeAndProductName(Request $request,$typeId,$productName){
+        $products    = Product::with('measurements')->with('inventory')->where('product_name',$productName)->get()->first();        
+
+        $total_stock = $products->inventory->total_stock;
+        $buying_price = $products->inventory->buying_price; // Min rate
+
+        $measurement = $products->measurements;
+        $qty = collect($measurement)->filter(function($value) use ($typeId){
+            return $value->id == $typeId;
+        })->first()->quantity;
+
+        return response()->json(
+            [
+                'max_qty'=>number_format(($total_stock/$qty),2),
+                'min_rate'=>$buying_price
+            ]
+        );        
     }
 }

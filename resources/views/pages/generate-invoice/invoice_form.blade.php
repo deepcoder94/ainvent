@@ -42,21 +42,6 @@
 
                 <input
                     type="hidden"
-                    id="customers"
-                    value="{{ $customers }}"
-                />
-                <input
-                    type="hidden"
-                    id="products"
-                    value="{{ $products }}"
-                />
-                <input
-                    type="hidden"
-                    id="measurements"
-                    value="{{ $measurements }}"
-                />
-                <input
-                    type="hidden"
                     id="store_url"
                     value="{{
                         route('newInvoiceCreate')
