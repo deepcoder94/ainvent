@@ -67,6 +67,7 @@
                 product_qty: groupedValues["product_qty[]"][i],
                 product_unit: groupedValues["product_unit[]"][i],
                 product_unit_price: groupedValues["product_unit_price[]"][i],
+                product_min_rate: groupedValues["product_min_rate[]"][i],
                 product_discount: groupedValues["product_discount[]"][i],
                 product_taxable_amt: groupedValues["product_taxable_amt[]"][i],
                 product_gst_rate: groupedValues["product_gst_rate[]"][i],
@@ -145,6 +146,8 @@
             dataType: "json",
             success: function (response) {
                 window.location.href = response.zipUrl;
+                $("#gst_invoice_form")[0].reset();
+                gstProducts={};
             },
             error: function (xhr, status, error) {},
         });
@@ -168,7 +171,26 @@
                 
             },
             error: function (xhr, status, error) {},
-        });        
+        });   
+
+        let gsurl = "{{ url('getMaxQtyByTypeAndProductName') }}/1/" + product_name;        
+        $.ajax({
+            url: gsurl, // The URL defined in your routes
+            type: "GET",
+            dataType:'json',
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                    "content"
+                ), // CSRF Token
+            },
+            success: function (response) {
+                $("#max_qty_span"+id).html('Max Qty: '+response.max_qty)
+                $("#min_rate_span"+id).html('Min Rate: '+response.min_rate)    
+                $("#min_rate_"+id).val(response.min_rate)            
+                
+            },
+            error: function (xhr, status, error) {},
+        });                
     }
 
     function calculateTaxableAmt(id){

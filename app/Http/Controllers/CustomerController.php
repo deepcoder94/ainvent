@@ -169,4 +169,8 @@ class CustomerController extends Controller
         return view('pages.customers.single',['customers'=>$cust]);
     }
 
+    public function getCustomersByBeat(Request $request,$id){
+        
+    }
+
 }

@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use ZipArchive;
 use App\Models\InventoryHistory;
+use App\Models\InvoiceProfit;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -137,6 +138,8 @@ class InvoiceController extends Controller
             $newInvoice->save();
             $total = 0;
 
+            $profit = 0;
+
             foreach ($products as $product) {
 
                 $measurement = Measurement::where('id',$product['measurement_id'])->get()->first();
@@ -155,6 +158,14 @@ class InvoiceController extends Controller
                 $inventory = Inventory::where('product_id', $product['product_id'])->get()->first();
                 $totalDeduction = $measurement->quantity * $product['qty'];
 
+
+                // Profit = SP-CP * qty
+                $sp = $product['rate'];
+                $cp = $product['minrate'];
+                $pqty = $product['qty'];
+                $profit += ($sp-$cp)*$pqty;
+
+
                 $total += $totalDeduction * $product['rate'];
 
                 $inventory->total_stock -= $totalDeduction;
@@ -168,6 +179,16 @@ class InvoiceController extends Controller
                 ]);
 
             }
+            
+            InvoiceProfit::create([
+                'invoice_number'=>$newInvoice->invoice_number,
+                'invoice_id'=>$newInvoice->id,
+                'gst_invoice_id'=>0,
+                'is_gst_invoice'=>0,
+                'profit_amount'=>$profit
+            ]);
+
+
 
                 CustomerPayment::create([
                     'customer_id'=>$request->input('customer_id'),
@@ -288,4 +309,39 @@ class InvoiceController extends Controller
         return view('pages.invoices.invoice-pdf',$invoicesArray);
 
     }
+
+    public function getCustomersByBeat(Request $request,$id){
+        $customers   = Customer::where('beat_id',$id)->get();
+        return response()->json([
+            'customers'=>$customers
+        ]);
+    }
+
+    public function getMeasurementsByProduct(Request $request,$id){
+        $products    = Product::with('measurements')->with('inventory')->where('id',$id)->get()->first();
+
+        return response()->json([
+            'data'=>$products->measurements
+        ]);
+    }
+
+    public function getMaxQtyByTypeAndProduct(Request $req,$typeId,$productId){
+        $products    = Product::with('measurements')->with('inventory')->where('id',$productId)->get()->first();        
+
+        $total_stock = $products->inventory->total_stock;
+        $buying_price = $products->inventory->buying_price; // Min rate
+
+        $measurement = $products->measurements;
+        $qty = collect($measurement)->filter(function($value) use ($typeId){
+            return $value->id == $typeId;
+        })->first()->quantity;
+
+        return response()->json(
+            [
+                'max_qty'=>number_format(($total_stock/$qty),2),
+                'min_rate'=>$buying_price
+            ]
+        );
+    }
+
 }

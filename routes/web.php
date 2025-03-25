@@ -19,6 +19,8 @@ use Illuminate\Http\Request;
 Route::get('/', [DashboardController::class,'index'])->name('index');
 Route::get('/dashboard', [DashboardController::class,'index'])->name('dashboard');
 Route::get('/sales/list', [DashboardController::class,'salesList'])->name('salesList');
+Route::get('/searchSales', [DashboardController::class,'searchSales'])->name('searchSales');
+
 Route::get('/profit/list', [DashboardController::class,'profitList'])->name('profitList');
 
 Route::resources([
@@ -105,8 +107,7 @@ Route::get('/invoiceView/{id}',[InvoiceController::class,'invoiceView'])->name('
 
 Route::get('/gstinvoice/list',[GstInvoiceController::class,'list'])->name('gstInvoiceList');
 
-// // Daily Sales
-// Route::get('/sales');
-
-// // Profits
-// Route::get('/profits');
+Route::get('/getCustomersByBeat/{id}',[InvoiceController::class,'getCustomersByBeat'])->name('getCustomersByBeat');
+Route::get('/getMaxQtyByTypeAndProductName/{typeId}/{productName}',[GstInvoiceController::class,'getMaxQtyByTypeAndProductName'])->name('getMaxQtyByTypeAndProductName');
+Route::get('/getMeasurementsByProduct/{id}',[InvoiceController::class,'getMeasurementsByProduct'])->name('getMeasurementsByProduct');
+Route::get('/getMaxQtyByTypeAndProduct/{typeId}/{productId}',[InvoiceController::class,'getMaxQtyByTypeAndProduct'])->name('getMaxQtyByTypeAndProduct');

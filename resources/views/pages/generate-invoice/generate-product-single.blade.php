@@ -19,6 +19,7 @@
     </td>
     <td scope="col">
         <input type="text" value="0" class="form-control" name="rate[]" id="rate_{{$id}}" onkeyup="restrictRate('{{$id}}')">
+        <input type="hidden" name="minrate[]" id="minrate_{{$id}}" value="0">
         <span style="color:red;font-size:13px;font-weight:600" id="min_rate_span{{ $id }}">Min Rate: </span>        
     </td>                    
     <td scope="col">

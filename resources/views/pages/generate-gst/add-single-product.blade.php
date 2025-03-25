@@ -17,10 +17,16 @@
     </td>
     <td>
         <input type="text" name="product_qty[]" id="qty_{{$id}}" class="form-control" value="1"  onkeyup="calculateTaxableAmt('{{$id}}')"/>
+        <span style="color:red;font-size:13px;font-weight:600" id="max_qty_span{{ $id }}">Max Qty: </span>
+
         <!-- Qty -->
         <input type="hidden" name="product_unit[]" id="" class="form-control" value="NOS"/>
         <input type="text" name="product_unit_price[]" id="unit_price_{{$id}}" class="form-control mt-1" value="0.00" onkeyup="calculateTaxableAmt('{{$id}}')"/>
+        <input type="hidden" name="product_min_rate[]" id="min_rate_{{$id}}" class="form-control mt-1" value="0.00"/>
+
         <!-- Unit Price -->
+        <span style="color:red;font-size:13px;font-weight:600" id="min_rate_span{{ $id }}">Min Rate: </span>        
+        
         <input type="hidden" name="product_discount[]" id="discount_{{$id}}" class="form-control" value="0.00"  onkeyup="calculateTaxableAmt('{{$id}}')"/>
         <!-- Discount -->
 
