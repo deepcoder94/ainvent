@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use ZipArchive;
 use App\Models\InventoryHistory;
-use App\Models\InvoiceProfit;
+// use App\Models\InvoiceProfit;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -144,12 +144,20 @@ class InvoiceController extends Controller
 
                 $measurement = Measurement::where('id',$product['measurement_id'])->get()->first();
 
+                // Profit = SP-CP * qty
+                $sp = $product['rate'];
+                $cp = $product['minrate'];
+                $pqty = $product['qty'];
+                $profit += (($sp-$cp)*$pqty) * $measurement->quantity;
+
+
                 $data = [
                     'invoice_id' => $newInvoice->id,
                     'product_id' => $product['product_id'],
                     'measurement_id' => $product['measurement_id'],
                     'quantity' => $product['qty'],
                     'rate' => $product['rate'],
+                    'buying_price'=>$product['minrate']
                 ];
 
 
@@ -159,11 +167,6 @@ class InvoiceController extends Controller
                 $totalDeduction = $measurement->quantity * $product['qty'];
 
 
-                // Profit = SP-CP * qty
-                $sp = $product['rate'];
-                $cp = $product['minrate'];
-                $pqty = $product['qty'];
-                $profit += ($sp-$cp)*$pqty;
 
 
                 $total += $totalDeduction * $product['rate'];
@@ -180,13 +183,13 @@ class InvoiceController extends Controller
 
             }
             
-            InvoiceProfit::create([
-                'invoice_number'=>$newInvoice->invoice_number,
-                'invoice_id'=>$newInvoice->id,
-                'gst_invoice_id'=>0,
-                'is_gst_invoice'=>0,
-                'profit_amount'=>$profit
-            ]);
+            // InvoiceProfit::create([
+            //     'invoice_number'=>$newInvoice->invoice_number,
+            //     'invoice_id'=>$newInvoice->id,
+            //     'gst_invoice_id'=>0,
+            //     'is_gst_invoice'=>0,
+            //     'profit_amount'=>$profit
+            // ]);
 
 
 

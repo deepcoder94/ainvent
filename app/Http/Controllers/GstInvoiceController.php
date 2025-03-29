@@ -5,7 +5,7 @@ use App\Models\GstInvoice;
 use App\Models\GstInvoiceProduct;
 use App\Models\Inventory;
 use App\Models\InventoryHistory;
-use App\Models\InvoiceProfit;
+// use App\Models\InvoiceProfit;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
@@ -148,18 +148,19 @@ class GstInvoiceController extends Controller
                     'non_advol_rate'=>$p['non_advol_rate']
                 ]),
                 'other_charges'=>$p['product_other_charges'],
-                'total'=>$p['product_total']
+                'total'=>$p['product_total'],
+                'buying_price'=>$cp
             ]);
             
         }
 
-        InvoiceProfit::create([
-            'invoice_number'=>$data['invoice_no'],
-            'invoice_id'=>0,
-            'gst_invoice_id'=>$lastRec->id,
-            'is_gst_invoice'=>1,
-            'profit_amount'=>$profit
-        ]);
+        // InvoiceProfit::create([
+        //     'invoice_number'=>$data['invoice_no'],
+        //     'invoice_id'=>0,
+        //     'gst_invoice_id'=>$lastRec->id,
+        //     'is_gst_invoice'=>1,
+        //     'profit_amount'=>$profit
+        // ]);
 
         $pdf = Pdf::loadView('pages.generate-gst.gst-format',$data);
         $pdf->setPaper('A4');
@@ -182,7 +183,7 @@ class GstInvoiceController extends Controller
 
     public function list(Request $request){
         $currentPage = 'gstInvoiceList';
-        $gst_invoices = GstInvoice::with('gst_invoice_products')->get()->toArray();
+        $gst_invoices = GstInvoice::with('gst_invoice_products')->orderBy('id','desc')->get()->toArray();
         foreach($gst_invoices as $index => $i){
             $gst_invoices[$index]['supplier_details'] = json_decode($i['supplier_details'],true);
             $gst_invoices[$index]['receipent_details'] = json_decode($i['receipent_details'],true);

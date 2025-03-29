@@ -1,4 +1,6 @@
 <x-layout :currentPage="$currentPage">
+    
+    <div id="productsPage" style="display:none">
     <div class="mt-2 mb-2">
         <button
         class="btn btn-primary"
@@ -46,6 +48,9 @@
             </div>
         </div>
     </section>
+        
+    </div>
+    
 
     @include('pages.products.modal',['measurements'=>$measurements])    
 
@@ -252,5 +257,52 @@
             }
         });            
         }
+        
+   // Function to show the login popup with username and password fields
+        function showLoginPopup() {
+            Swal.fire({
+                title: 'Login to Continue',
+                html: `
+                    <input id="username" class="swal2-input" placeholder="Username">
+                    <input id="password" class="swal2-input" type="password" placeholder="Password">
+                `,
+                confirmButtonText: 'Login',
+                preConfirm: () => {
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    
+                    // Simple validation: check if both fields are filled
+                    if (!username || !password) {
+                        Swal.showValidationMessage('Both fields are required');
+                        return false;
+                    }
+                    return { username, password };
+                }
+            }).then(result => {
+                if (result.isConfirmed) {
+                    const { username, password } = result.value;
+
+                    // Optionally, send these credentials to the server via AJAX
+                    validateLogin(username, password);
+                }
+            });
+        }
+
+        // Validate the login credentials (can be done via AJAX)
+        function validateLogin(username, password) {
+            // Simulate a login check (replace with your server-side validation)
+            if (username === "admin" && password === "admin") {
+                Swal.fire('Login Successful', 'You can now access the page.', 'success');
+                document.getElementById("productsPage").style.display = "block"; // Show actual content
+            } else {
+                Swal.fire('Invalid Credentials', 'Please check your username and password.', 'error');
+                showLoginPopup(); // Re-show the popup for retry
+            }
+        }
+
+        // Show the login popup as soon as the page loads
+        window.onload = function() {
+            showLoginPopup();
+        };         
     </script>
 </x-layout>
