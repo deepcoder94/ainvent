@@ -9,15 +9,16 @@
         </a>
       </li><!-- End F.A.Q Page Nav -->
       <li class="nav-item">
-        <a class="nav-link {{ $currentPage=='salesList'?'':'collapsed' }}" href="{{ route('salesList') }}">
-          <i class="bi bi-grid"></i>
-          <span>Sales List</span>
-        </a>
-      </li><!-- End F.A.Q Page Nav -->      
-      <li class="nav-item">
         <a class="nav-link {{ $currentPage=='profitList'?'':'collapsed' }}" href="{{ route('profitList') }}">
           <i class="bi bi-grid"></i>
           <span>Profit List</span>
+        </a>
+      </li><!-- End F.A.Q Page Nav -->      
+      
+      <li class="nav-item">
+        <a class="nav-link {{ $currentPage=='salesList'?'':'collapsed' }}" href="{{ route('salesList') }}">
+          <i class="bi bi-grid"></i>
+          <span>Sales List</span>
         </a>
       </li><!-- End F.A.Q Page Nav -->      
 

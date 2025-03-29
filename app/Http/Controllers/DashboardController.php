@@ -6,6 +6,10 @@ use App\Models\Beat;
 use App\Models\InvoiceProfit;
 use App\Models\PaymentHistory;
 use Illuminate\Http\Request;
+use App\Models\InvoiceProduct;
+use App\Models\GstInvoiceProduct;
+
+
 use Carbon\Carbon;
 
 
@@ -15,6 +19,7 @@ class DashboardController extends Controller
 
         $payments = PaymentHistory::
                         whereDate('created_at',Carbon::today())
+                        ->orderBy('id','desc')
                         ->sum('amount');
         $total_pay = number_format($payments,3);
         $currentPage = 'dashboard';
@@ -40,7 +45,7 @@ class DashboardController extends Controller
         $currentPage = 'salesList';
 
         $payments = PaymentHistory::with('beat')  // Eager load the 'beat' relationship
-        ->orderBy('created_at', 'asc') // Order by date
+        ->orderBy('created_at', 'desc') // Order by date
         ->get()
         ->groupBy(function($date) {
             return Carbon::parse($date->created_at)->toDateString(); // Group by date
@@ -63,9 +68,70 @@ class DashboardController extends Controller
     }
     
     public function profitList(Request $request){
+        $perPage = 10;        
+        $currentPageNum = 1;
+        
+        $prods = GstInvoiceProduct::with('invoice')->orderBy('created_at', 'desc')->get()->toArray();
+        $groupedData = collect($prods)->groupBy('gst_invoice_id')->map(function ($invoiceItems) {
+            // For each invoice group, calculate the total profit
+            $invoice = $invoiceItems->first(); // Get the first item to retrieve invoice details (like created_at)
+            $totalProfit = $invoiceItems->sum(function ($item) {
+                return ($item['unit_price'] - $item['buying_price']) * $item['quantity'];
+            });
+        
+            return [
+                'created_at' => $invoice['created_at'], // You can take created_at from any item in the group
+                'gst_invoice_id' => $invoice['gst_invoice_id'],
+                'total_profit' => $totalProfit,
+                'invoice_number' => $invoice['invoice']['invoice_number'], // Invoice number
+            ];
+        });
+        
+        $prods2 = InvoiceProduct::with('invoice')->with('measurement')->orderBy('created_at', 'desc')->get()->toArray();
+        $groupedData2 = collect($prods2)->groupBy('invoice_id')->map(function ($invoiceItems) {
+            // For each invoice group, calculate the total profit
+            $invoice = $invoiceItems->first(); // Get the first item to retrieve invoice details (like created_at)
+            $totalProfit = $invoiceItems->sum(function ($item) {
+                return (($item['rate'] - $item['buying_price']) * $item['quantity']) * $item['measurement']['quantity'];
+            });
+        
+            return [
+                'created_at' => $invoice['created_at'], // You can take created_at from any item in the group
+                'gst_invoice_id' => $invoice['invoice_id'],
+                'total_profit' => $totalProfit,
+                'invoice_number' => $invoice['invoice']['invoice_number'], // Invoice number
+            ];
+        });        
+        
+        $mergedCollection = $groupedData->merge($groupedData2);
+        
+        $groupedData = $mergedCollection->sortByDesc('created_at');
+
         $currentPage = 'profitList';
-        $profits = InvoiceProfit::get();
-        return view('pages.dashboard.profit-list',compact('currentPage','profits'));
+        $total_records = count($mergedCollection);
+        $pageNums = $total_records / $perPage; 
+        $totalpagnums = is_float($pageNums) ? (int)$pageNums + 1 : $pageNums;
+        $isSingleView = false;
+        
+        if(!empty($request->input('perPage'))){
+            $perPage = $request->input('perPage');
+            $isSingleView = true;
+        }
+        if(!empty($request->input('currentPageNum'))){
+            $currentPageNum = $request->input('currentPageNum');
+            $isSingleView = true;
+
+        }
+        
+        $view = 'pages.dashboard.profit-list';
+        if($isSingleView){
+            $view = 'pages.dashboard.profit-list-single';
+        }
+        
+
+        $groupedData = $mergedCollection->take($perPage)->skip($currentPageNum)->all();
+
+        return view($view,compact('currentPage','groupedData','perPage','currentPageNum','total_records','totalpagnums'));
 
     }
 
@@ -106,6 +172,74 @@ class DashboardController extends Controller
         $beats = Beat::get();
         return view('pages.dashboard.sales-list-single',compact('beats','payments'));
 
+    }
+    
+    public function profitExport(){
+        
+
+        $prods = GstInvoiceProduct::with('invoice')->orderBy('created_at', 'desc')->get()->toArray();
+        $groupedData = collect($prods)->groupBy('gst_invoice_id')->map(function ($invoiceItems) {
+            // For each invoice group, calculate the total profit
+            $invoice = $invoiceItems->first(); // Get the first item to retrieve invoice details (like created_at)
+            $totalProfit = $invoiceItems->sum(function ($item) {
+                return ($item['unit_price'] - $item['buying_price']) * $item['quantity'];
+            });
+        
+            return [
+                'created_at' => $invoice['created_at'], // You can take created_at from any item in the group
+                'gst_invoice_id' => $invoice['gst_invoice_id'],
+                'total_profit' => $totalProfit,
+                'invoice_number' => $invoice['invoice']['invoice_number'], // Invoice number
+            ];
+        });
+        
+        $prods2 = InvoiceProduct::with('invoice')->with('measurement')->orderBy('created_at', 'desc')->get()->toArray();
+        $groupedData2 = collect($prods2)->groupBy('invoice_id')->map(function ($invoiceItems) {
+            // For each invoice group, calculate the total profit
+            $invoice = $invoiceItems->first(); // Get the first item to retrieve invoice details (like created_at)
+            $totalProfit = $invoiceItems->sum(function ($item) {
+                return (($item['rate'] - $item['buying_price']) * $item['quantity']) * $item['measurement']['quantity'];
+            });
+        
+            return [
+                'created_at' => \Carbon\Carbon::parse($invoice['created_at'])->timezone('Asia/Kolkata')->format('d-m-Y'), // You can take created_at from any item in the group
+                'gst_invoice_id' => $invoice['invoice_id'],
+                'total_profit' => $totalProfit,
+                'invoice_number' => $invoice['invoice']['invoice_number'], // Invoice number
+            ];
+        });        
+        
+        $mergedCollection = $groupedData->merge($groupedData2);
+        
+        $groupedData = $mergedCollection->sortByDesc('created_at');        
+        
+        // Generate the filename
+        $filename = 'profits-' . now()->timestamp . '.csv';
+
+        // Define the path where the file will be stored
+        $filePath = storage_path('app/' . $filename);
+
+        // Open the file for writing
+        $handle = fopen($filePath, 'w');
+
+        // Add the CSV column headings (optional)
+        fputcsv($handle, ['Date', 'Total Profit', 'Invoice number']);
+
+        // Loop through the data and write each row to the CSV file
+        foreach ($groupedData as $d) {
+            // Write the product row to the CSV
+            fputcsv($handle, [
+                $d['created_at'],
+                $d['total_profit'],
+                $d['invoice_number'],
+            ]);
+        }
+
+        // Close the file handle
+        fclose($handle);
+
+        // Return the file path so it can be used for the download
+        return response()->json(['url_path'=> route('download.product.csv',['file'=>$filename])]);
     }
 
 }

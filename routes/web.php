@@ -22,6 +22,7 @@ Route::get('/sales/list', [DashboardController::class,'salesList'])->name('sales
 Route::get('/searchSales', [DashboardController::class,'searchSales'])->name('searchSales');
 
 Route::get('/profit/list', [DashboardController::class,'profitList'])->name('profitList');
+Route::get('/profit/export', [DashboardController::class,'profitExport'])->name('profitExport');
 
 Route::resources([
     'distributor'=>DistributorController::class,
