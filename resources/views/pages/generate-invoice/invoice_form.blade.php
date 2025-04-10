@@ -58,7 +58,20 @@
                         >Select Products</label
                     >
                 </div>
-                <div>
+                <div class="d-flex">
+                    <div class="form-check form-switch" style="margin-right: 13px">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="is_validation_active"
+                            checked
+                        />
+                        <label
+                            class="form-check-label"
+                            for="is_validation_active"
+                            >Is Rate Validation active</label
+                        >
+                    </div>
                     <button
                         class="btn btn-primary"
                         type="button"
@@ -66,6 +79,7 @@
                     >
                         Add Products
                     </button>
+            
                 </div>
             </div>
 

@@ -198,7 +198,7 @@
                 groupedValues["rate[]"][i].length == 0 
             )
             {
-                alert('Invalid inputs. please try again 3')
+                alert('Invalid inputs. please try again (Empty)')
                 isValid=false
                 return
             }
@@ -213,11 +213,17 @@
         }
         isValid=true
         if(!isQtyValid){
-            alert('Invalid inputs. please check once 2')
+            alert('Invalid inputs. please check once (Qty)')
             return;
         }
+
+        let is_validation_active = $("#is_validation_active").prop("checked")
+        if(!is_validation_active) {
+            isRateValid = true
+        }
+        
         if(!isRateValid){
-            alert('Invalid inputs. please check once 1')
+            alert('Invalid inputs. please check once (Rate)')
             return;
         }        
         

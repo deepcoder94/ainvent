@@ -34,7 +34,12 @@
               <span>Generate GST Invoice</span>
             </a>
           </li><!-- End F.A.Q Page Nav -->
-
+          <li class="nav-item">
+            <a class="nav-link {{ $currentPage=='newInvoice'?'':'collapsed' }}" href="{{ route('showNewInvoiceForm') }}">
+              <i class="bi bi-clipboard-plus"></i>
+              <span>Generate New Invoice</span>
+            </a>
+          </li><!-- End F.A.Q Page Nav -->
           <li class="nav-item">
             <a class="nav-link {{ $currentPage=='invoicesList'?'':'collapsed' }}" href="{{ route('invoiceList') }}">
               <i class="bi bi-clipboard-data"></i>
