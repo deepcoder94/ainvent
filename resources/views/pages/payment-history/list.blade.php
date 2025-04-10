@@ -19,6 +19,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body tablecontainer">
+                                                
                         <!-- Table with stripped rows -->
                         <table class="table table-bordered mt-3">
                             <thead>
@@ -40,6 +41,8 @@
         </div>
     </section>
     @include('pages.payment-history.single-invoice-detail-modal')
+
+    
 
     <script>
         function viewSingleInvoicePayment(invid){

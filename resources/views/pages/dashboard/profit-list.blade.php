@@ -1,14 +1,10 @@
 <x-layout :currentPage="$currentPage">
-    <section class="section" id="profitSection" style="display:none">
+    <section class="section">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Profit List</h5>
-                        <button class="btn btn-warning mt-2 mb-2" onclick="exportProducts()">
-                            <i class="bi bi-download me-1"></i> Export 
-                        </button>        
-                        
                         <div class="row flex" style="justify-content: flex-end">
                             <div class="col-lg-2 mb-2">
                                 <label for="">Per Page</label>
@@ -27,8 +23,6 @@
                                 </select>
                             </div>                            
                         </div>
-                        
-                        
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
@@ -38,7 +32,7 @@
                                 </tr>
                             </thead>
                             <tbody id="salesbody">
-                                @include('pages.dashboard.profit-list-single',['groupedData'=>$groupedData])
+                                @include('pages.dashboard.profit-list-single',['profits'=>$profits])
                             </tbody>
                         </table>                                                
                     </div>
@@ -47,24 +41,6 @@
         </div>
     </section>
     <script>
-        function exportProducts(){
-            $.ajax({
-            url: "{{ route('profitExport') }}", // The route to your export method
-            type: 'GET',
-            headers: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                        "content"
-                    ), // CSRF Token
-                    },
-            success: function(response) {
-                window.location.href = response.url_path;
-            },
-            error: function(xhr, status, error) {
-                alert('There was an error exporting the CSV. Please try again.');
-            }
-        });            
-        }
-        
         function paginateRecords(){
             let currentPage = $("#currentPage").val();
             let perPage = $("#perPage").val();
@@ -88,52 +64,5 @@
         });
 
         }
-        
-   // Function to show the login popup with username and password fields
-        function showLoginPopup() {
-            Swal.fire({
-                title: 'Login to Continue',
-                html: `
-                    <input id="username" class="swal2-input" placeholder="Username">
-                    <input id="password" class="swal2-input" type="password" placeholder="Password">
-                `,
-                confirmButtonText: 'Login',
-                preConfirm: () => {
-                    const username = document.getElementById('username').value;
-                    const password = document.getElementById('password').value;
-                    
-                    // Simple validation: check if both fields are filled
-                    if (!username || !password) {
-                        Swal.showValidationMessage('Both fields are required');
-                        return false;
-                    }
-                    return { username, password };
-                }
-            }).then(result => {
-                if (result.isConfirmed) {
-                    const { username, password } = result.value;
-
-                    // Optionally, send these credentials to the server via AJAX
-                    validateLogin(username, password);
-                }
-            });
-        }
-
-        // Validate the login credentials (can be done via AJAX)
-        function validateLogin(username, password) {
-            // Simulate a login check (replace with your server-side validation)
-            if (username === "admin" && password === "admin") {
-                Swal.fire('Login Successful', 'You can now access the page.', 'success');
-                document.getElementById("profitSection").style.display = "block"; // Show actual content
-            } else {
-                Swal.fire('Invalid Credentials', 'Please check your username and password.', 'error');
-                showLoginPopup(); // Re-show the popup for retry
-            }
-        }
-
-        // Show the login popup as soon as the page loads
-        window.onload = function() {
-            showLoginPopup();
-        };        
     </script>
 </x-layout>

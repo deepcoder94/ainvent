@@ -19,7 +19,7 @@ use App\Models\InventoryHistory;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class InvoiceController extends Controller
+class NewInvoiceController2 extends Controller
 {
     public function index()
     {
@@ -27,8 +27,7 @@ class InvoiceController extends Controller
         $beats       = Beat::get();
         $products    = Product::with('measurements')->with('inventory')->get();
         $measurement = Measurement::get();
-
-        return view('pages.generate-invoice.generate', ['currentPage' => 'invoicesCreate', 'beats' => $beats, 'customers' => $customers, 'products' => $products, 'measurements' => $measurement]);
+        return view('pages.generate-invoice-new.generate', ['currentPage' => 'invoiceGenerateNew', 'beats' => $beats, 'customers' => $customers, 'products' => $products, 'measurements' => $measurement]);
     }
 
     public function list()
@@ -47,7 +46,7 @@ class InvoiceController extends Controller
         return view('pages.invoices.list', ['currentPage' => 'invoicesList', 'invoices' => $invoices,'customers'=>$customers,'beats'=>$beats,'pages'=>$pages]);
     }
 
-    public function loadpdf(Request $request)
+    public function loadPdfNew(Request $request)
     {
         $invoices = $request->input('selectedInvoices');
         $currentDate = Carbon::now()->format('d-m-Y'); // Format the date as you want
@@ -67,18 +66,38 @@ class InvoiceController extends Controller
             // Fetch invoice data
             $invoice = Invoice::with('customer')->with('beat')->find($i);
             $products = InvoiceProduct::where('invoice_id', $i)->with('product')->with('measurement')->get();
-
             $items = [];
+            $boxtotal = 0;
+            $pcstotal = 0;
+            $totalnetamt = 0;
+            $totalgst = 0;
+            $taxableamt = 0;
+
+            // dd($products);
             foreach ($products as $p) {
                 $item = [
                     'qty' => $p->quantity,
                     'type' => $p->measurement->name,
                     'product_description' => $p->product->product_name,
                     'rate' => $p->rate,
-                    'amount' => $p->quantity * $p->rate * $p->measurement->quantity
+                    'amount' => $p->quantity * $p->rate * $p->measurement->quantity,
+                    'product_hsn'=>$p->product->product_hsn,
+                    'box'=>$p->measurement->name!='Piece'?$p->quantity:0,
+                    'pcs'=>$p->measurement->name=='Piece'?$p->quantity:0,
+                    'gst_rate'=>$p->product->gst_rate,
+                    'gst_amt'=>($p->product->gst_rate/100)*($p->rate * $p->measurement->quantity * $p->quantity),
+                    'net_amt'=>(($p->product->gst_rate/100)*($p->rate * $p->measurement->quantity * $p->quantity))+ ($p->rate * $p->measurement->quantity * $p->quantity)
                 ];
+                $boxtotal += $p->measurement->name!='Piece'?$p->quantity:0;
+                $pcstotal += $p->measurement->name=='Piece'?$p->quantity:0;
+                $taxableamt += $p->rate * $p->measurement->quantity * $p->quantity;
+                
+                $totalnetamt += (($p->product->gst_rate/100)*($p->rate * $p->measurement->quantity * $p->quantity))+ ($p->rate * $p->measurement->quantity * $p->quantity);
+                $totalgst += ($p->product->gst_rate/100)*($p->rate * $p->measurement->quantity * $p->quantity);
                 array_push($items, $item);
             }
+
+
 
             $total = collect($items)->sum('amount');
             $grandTotal = $total;
@@ -89,14 +108,15 @@ class InvoiceController extends Controller
             $distributor = Distributor::get()->first();
 
 
-            $data = compact('items', 'total', 'grandTotal', 'customer', 'invoice_number', 'date', 'beat_name', 'distributor');
+            $data = compact('items', 'total', 'grandTotal', 'customer', 'invoice_number', 'date', 'beat_name', 'distributor','boxtotal','pcstotal','totalnetamt','totalgst','taxableamt');
             $finalArray[] = $data;
-
         }
         $invoicesArray = ['invoices'=>$finalArray];
+        // dd($invoicesArray);
+
             // Generate the PDF for the current invoice
-            $pdf = PDF::loadView('pages.invoices.invoice-pdf', $invoicesArray);
-            $pdf->setPaper('A5');
+            $pdf = PDF::loadView('pages.invoices.new-invoice-pdf', $invoicesArray);
+            $pdf->setPaper('A4');
             $pdfContent = $pdf->output();
 
             // Add the PDF to the zip with a unique filename (e.g., invoice number)
@@ -149,6 +169,8 @@ class InvoiceController extends Controller
                 $pqty = $product['qty'];
                 $profit += ($sp-$cp)*$pqty;
 
+                $pd = Product::where('id',$product['product_id'])->get()->first();
+
 
                 $data = [
                     'invoice_id' => $newInvoice->id,
@@ -156,7 +178,8 @@ class InvoiceController extends Controller
                     'measurement_id' => $product['measurement_id'],
                     'quantity' => $product['qty'],
                     'rate' => $product['rate'],
-                    'buying_price'=>$cp
+                    'buying_price'=>$cp,
+                    'gst_rate'=>$pd->gst_rate
                 ];
 
 
@@ -165,10 +188,15 @@ class InvoiceController extends Controller
                 $inventory = Inventory::where('product_id', $product['product_id'])->get()->first();
                 $totalDeduction = $measurement->quantity * $product['qty'];
 
+                $rateded = $totalDeduction * $product['rate'];
+
+                $t = (($pd->gst_rate/100)*$rateded) + $rateded; 
+
+
+                $total += $t;
 
 
 
-                $total += $totalDeduction * $product['rate'];
 
                 $inventory->total_stock -= $totalDeduction;
                 $inventory->save();

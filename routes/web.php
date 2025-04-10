@@ -11,6 +11,8 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\BulkUploadController;
 use App\Http\Controllers\GstInvoiceController;
+use App\Http\Controllers\NewInvoiceController;
+use App\Http\Controllers\NewInvoiceController2;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReturnController;
 use App\Models\Product;
@@ -22,7 +24,6 @@ Route::get('/sales/list', [DashboardController::class,'salesList'])->name('sales
 Route::get('/searchSales', [DashboardController::class,'searchSales'])->name('searchSales');
 
 Route::get('/profit/list', [DashboardController::class,'profitList'])->name('profitList');
-Route::get('/profit/export', [DashboardController::class,'profitExport'])->name('profitExport');
 
 Route::resources([
     'distributor'=>DistributorController::class,
@@ -54,6 +55,9 @@ Route::post('/invoice/create',[InvoiceController::class,'create'])->name('newInv
 Route::post('/invoice/loadpdf',[InvoiceController::class,'loadpdf'])->name('loadPdf');
 Route::get('/searchInvoice',[InvoiceController::class,'searchInvoice'])->name('invoice.search');
 
+Route::get('/invoice/generatenew',[NewInvoiceController2::class,'index'])->name('invoiceGenerateNew');
+Route::post('/invoice/loadpdfnew',[NewInvoiceController2::class,'loadPdfNew'])->name('loadPdfNew');
+Route::post('/invoice/createnew',[NewInvoiceController2::class,'create'])->name('newInvoiceCreate2');
 
 Route::get('/searchCustomer',[CustomerController::class,'searchCustomer'])->name('customer.search');
 
@@ -97,6 +101,18 @@ Route::get('/addGstProduct/{id}',function(Request $request,$id){
 })->name('addGstProduct');
 
 Route::get('/addGstInvoiceFormProduct/{id}',[GstInvoiceController::class,'addGstInvoiceFormProduct'])->name('addGstInvoiceFormProduct');
+
+
+Route::get('/newinvoice/generate',[NewInvoiceController::class,'showNewInvoiceForm'])->name('showNewInvoiceForm');
+Route::post('/generateNewInvoice',[NewInvoiceController::class,'generateNewInvoice'])->name('generateNewInvoice');
+Route::get('/addNewProduct/{id}',function(Request $request,$id){
+    $products = Product::get();
+    return view('pages.new-invoice.add-single-product',compact('id','products'));
+})->name('addNewProduct');
+
+Route::get('/addNewInvoiceFormProduct/{id}',[NewInvoiceController::class,'addNewInvoiceFormProduct'])->name('addNewInvoiceFormProduct');
+
+
 
 Route::get('/payment/history',[PaymentController::class,'paymentHistory'])->name('paymentHistory');
 Route::get('/getSingleInvoicePaymentDetail/{id}',[PaymentController::class,'getSingleInvoicePaymentDetail'])->name('getSingleInvoicePaymentDetail');

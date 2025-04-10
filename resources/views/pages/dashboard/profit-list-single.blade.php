@@ -1,8 +1,8 @@
-@forelse ($groupedData as $profit)
+@forelse ($profits as $profit)
     <tr>
-        <td>{{ \Carbon\Carbon::parse($profit['created_at'])->timezone('Asia/Kolkata')->format('d-m-Y H:i:s') }}</td>
-        <td>{{ $profit['invoice_number'] }}</td>
-        <td>{{ $profit['total_profit'] }}</td>
+        <td>{{ \Carbon\Carbon::parse($profit->created_at)->format('F j, Y') }}</td>
+        <td>{{ $profit->invoice_number }}</td>
+        <td>{{ $profit->profit_amount }}</td>
     </tr>
     @empty
     <tr>

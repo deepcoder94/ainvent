@@ -1,7 +1,7 @@
 @forelse ($payments as $date => $beats)
 @forelse ($beats as $beatId => $data)
     <tr>
-        <td>{{ \Carbon\Carbon::parse($date)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s') }}</td>
+        <td>{{ \Carbon\Carbon::parse($date)->format('F j, Y') }}</td>
         <td>{{ $data['beat_name'] }}</td>
         <td>{{ $data['total_amount'] }}</td>
     </tr>

@@ -198,9 +198,9 @@
                 groupedValues["rate[]"][i].length == 0 
             )
             {
-                alert('Invalid inputs. please try again')
-                isValid=false
-                return
+                // alert('Invalid inputs. please try again 1')
+                // isValid=false
+                // return
             }
             finalData.push({
                 product_id: groupedValues["product_id[]"][i],
@@ -212,8 +212,8 @@
         }
         isValid=true
         if(!isQtyValid){
-            alert('Invalid inputs. please check once')
-            return;
+            // alert('Invalid inputs. please check once 2')
+            // return;
         }
 
         let is_validation_active = $("#is_validation_active").prop("checked")
@@ -222,8 +222,8 @@
         }
         
         if(!isRateValid){
-            alert('Invalid inputs. please check once')
-            return;
+            // alert('Invalid inputs. please check once 3')
+            // return;
         }        
         
         let data = {

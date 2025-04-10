@@ -44,7 +44,7 @@
                     type="hidden"
                     id="store_url"
                     value="{{
-                        route('newInvoiceCreate')
+                        route('newInvoiceCreate2')
                     }}"
                 />
             </div>
@@ -84,7 +84,7 @@
 
             </div>
 
-            @include('pages.generate-invoice.product_table')
+            @include('pages.generate-invoice-new.product_table')
         
         </div>
     </div>

@@ -8,9 +8,5 @@ class GstInvoiceProduct extends Model
 {
     protected $table = 'gst_invoice_products';
 
-    protected $fillable = ["gst_invoice_id","product_name","hsn_code","quantity","unit_price","taxable_amount","other_charges","total","gst_breakup","buying_price"];
-    
-    public function invoice(){
-        return $this->belongsTo(GstInvoice::class,'gst_invoice_id');
-    }
+    protected $fillable = ["gst_invoice_id","product_name","hsn_code","quantity","unit_price","taxable_amount","other_charges","total","gst_breakup"];
 }

@@ -6,11 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class InvoiceProduct extends Model
 {
-    protected $fillable = ["invoice_id","product_id","rate","quantity","measurement_id","buying_price"];
-    
-    public function invoice(){
-        return $this->belongsTo(Invoice::class,'invoice_id');        
-    }
+    protected $fillable = ["invoice_id","product_id","rate","quantity","measurement_id","gst_rate"];
 
     public function product(){
         return $this->belongsTo(Product::class,'product_id');

@@ -18,6 +18,25 @@
                                 </select>
                             </div>                            
                         </div>
+                        <div class="row flex" style="justify-content: flex-end">
+                            <div class="col-lg-2 mb-2">
+                                <label for="">Per Page</label>
+                                <select id="perPage" class="form-control" onchange="paginateRecords()">
+                                    @for ($i = $perPage; $i <= 100; $i+=$perPage)
+                                        <option value="{{ $i }}">{{ $i }}</option>
+                                    @endfor                                                                       
+                                </select>
+                            </div>
+                            <div class="col-lg-2 mb-2">
+                                <label for="">Current Page</label>
+                                <select id="currentPage" class="form-control" onchange="paginateRecords()">
+                                    @for ($i = 1; $i <= $totalpagnums; $i++)
+                                        <option value="{{ $i }}">{{ $i }}</option>
+                                    @endfor                                   
+                                </select>
+                            </div>                            
+                        </div>
+
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
@@ -58,5 +77,30 @@
             });                        
 
         }
+        function paginateRecords(){
+            let currentPage = $("#currentPage").val();
+            let perPage = $("#perPage").val();
+            let url = '{{ route('salesList') }}';
+            $.ajax({
+            url: url, // The URL defined in your routes
+            type: "GET",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                    "content"
+                ), // CSRF Token
+            },
+            data:{
+                currentPageNum:currentPage,
+                perPage:perPage
+            },
+            success: function (response) {
+                $("#salesbody").html(response)                
+            },
+            error: function (xhr, status, error) {},
+        });
+
+        }
+    </script>        
     </script>
+    
 </x-layout>
