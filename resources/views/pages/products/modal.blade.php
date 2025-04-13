@@ -56,6 +56,18 @@
                             />
                         </div>                        
                         <div class="col-12">
+                            <label for="product_hsn" class="form-label"
+                                >GST Rate</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="gst_rate"
+                                name="gst_rate"
+                                required
+                            />
+                        </div>                                                
+                        <div class="col-12">
                             <label for="product_rate" class="form-label"
                                 >Measurement Types</label
                             >

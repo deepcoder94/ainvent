@@ -3,6 +3,8 @@
     <td>{{ $product->id }}</td>
     <td>{{ $product->product_name }}</td>
     <td>{{ $product->product_rate }}</td>
+    <td>{{ $product->gst_rate }}</td>
+
     <td>
         @foreach ($product->measurements as $m)
             <span class="badge bg-primary">{{ $m->name }}</span>            
@@ -10,13 +12,6 @@
     </td>
     <td>{{ $product->product_hsn }}</td>
 
-    <td>
-        <span
-            class="badge {{ $product->is_active == 1 ? 'bg-success':'bg-danger' }}"
-        >
-            {{ $product->is_active == 1 ? 'Active':'Inactive' }}
-        </span>
-    </td>
     <!-- Edit/Delete Buttons (Side by Side on All Screens) -->
     <td class="d-flex flex-row">
         <!-- Edit Button -->

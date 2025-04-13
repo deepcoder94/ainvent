@@ -152,35 +152,33 @@
             Swal.fire({
                 title: 'Login to Continue',
                 html: `
-                    <input id="username" class="swal2-input" placeholder="Username">
                     <input id="password" class="swal2-input" type="password" placeholder="Password">
                 `,
                 confirmButtonText: 'Login',
                 preConfirm: () => {
-                    const username = document.getElementById('username').value;
                     const password = document.getElementById('password').value;
                     
                     // Simple validation: check if both fields are filled
-                    if (!username || !password) {
+                    if (!password) {
                         Swal.showValidationMessage('Both fields are required');
                         return false;
                     }
-                    return { username, password };
+                    return { password };
                 }
             }).then(result => {
                 if (result.isConfirmed) {
-                    const { username, password } = result.value;
+                    const { password } = result.value;
 
                     // Optionally, send these credentials to the server via AJAX
-                    validateLogin(username, password);
+                    validateLogin(password);
                 }
             });
         }
 
         // Validate the login credentials (can be done via AJAX)
-        function validateLogin(username, password) {
+        function validateLogin(password) {
             // Simulate a login check (replace with your server-side validation)
-            if (username === "admin" && password === "admin") {
+            if (password === "4561") {
                 Swal.fire('Login Successful', 'You can now access the page.', 'success');
                 document.getElementById("beatPage").style.display = "block"; // Show actual content
             } else {

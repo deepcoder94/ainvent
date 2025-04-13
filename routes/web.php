@@ -12,6 +12,7 @@ use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\BulkUploadController;
 use App\Http\Controllers\GstInvoiceController;
 use App\Http\Controllers\NewInvoiceController;
+use App\Http\Controllers\NewInvoiceController2;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReturnController;
 use App\Models\Product;
@@ -23,6 +24,8 @@ Route::get('/sales/list', [DashboardController::class,'salesList'])->name('sales
 Route::get('/searchSales', [DashboardController::class,'searchSales'])->name('searchSales');
 
 Route::get('/profit/list', [DashboardController::class,'profitList'])->name('profitList');
+Route::get('/profitexport', [DashboardController::class,'profitExport'])->name('profitExport');
+
 
 Route::resources([
     'distributor'=>DistributorController::class,
@@ -124,3 +127,8 @@ Route::get('/getCustomersByBeat/{id}',[InvoiceController::class,'getCustomersByB
 Route::get('/getMaxQtyByTypeAndProductName/{typeId}/{productName}',[GstInvoiceController::class,'getMaxQtyByTypeAndProductName'])->name('getMaxQtyByTypeAndProductName');
 Route::get('/getMeasurementsByProduct/{id}',[InvoiceController::class,'getMeasurementsByProduct'])->name('getMeasurementsByProduct');
 Route::get('/getMaxQtyByTypeAndProduct/{typeId}/{productId}',[InvoiceController::class,'getMaxQtyByTypeAndProduct'])->name('getMaxQtyByTypeAndProduct');
+
+Route::get('/invoice/generatenew',[NewInvoiceController2::class,'index'])->name('invoiceGenerateNew');
+Route::post('/invoice/loadpdfnew',[NewInvoiceController2::class,'loadPdfNew'])->name('loadPdfNew');
+Route::post('/invoice/createnew',[NewInvoiceController2::class,'create'])->name('newInvoiceCreate2');
+

@@ -38,6 +38,7 @@ class ProductController extends Controller
                 'product_rate' => 'required|numeric',
                 'is_active'    => 'required',
                 'product_hsn'    => 'required',
+                'gst_rate'    => 'required',                
             ]);
 
             $product = Product::create([
@@ -45,6 +46,7 @@ class ProductController extends Controller
                 'product_rate' => $request->product_rate,
                 'is_active'    => $request->is_active,
                 'product_hsn'    => $request->product_hsn,
+                'gst_rate'    => $request->gst_rate,                
             ]);
 
             $product_measurements = $request->product_measurements;
@@ -108,6 +110,7 @@ class ProductController extends Controller
                 'product_rate' => 'required',
                 'is_active'    => 'required',
                 'product_hsn'    => 'required',
+                'gst_rate'    => 'required',                
             ]);
             $resource = Product::findOrFail($id);
 
@@ -116,6 +119,7 @@ class ProductController extends Controller
                 'product_rate' => $request->product_rate,
                 'is_active'    => $request->is_active,
                 'product_hsn'    => $request->product_hsn,
+                'gst_rate'    => $request->gst_rate,                
             ]);
             $product_measurements = $request->product_measurements;
             ProductMeasurement::where('product_id',$resource->id)->delete();

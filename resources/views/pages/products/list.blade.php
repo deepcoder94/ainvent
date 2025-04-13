@@ -31,9 +31,9 @@
                                         <th>ID</th>
                                         <th>Name</th>
                                         <th>Rate</th>
+                                        <th>GST Rate</th>
                                         <th>Types</th>
                                         <th>HSN Code</th>
-                                        <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -73,6 +73,8 @@
             $("#product_name").val(productJson.product_name);
             $("#product_rate").val(productJson.product_rate);
             $("#product_hsn").val(productJson.product_hsn);
+            $("#gst_rate").val(productJson.gst_rate);
+
             
             if (productJson.is_active == 1) {
                 $("#product_active").prop("checked", true);
@@ -136,7 +138,9 @@
                 product_rate: form.find((item) => item.name === "product_rate")
                     .value,
                 product_hsn: form.find((item) => item.name === "product_hsn")
-                    .value,                    
+                    .value,       
+                gst_rate: form.find((item) => item.name === "gst_rate")
+                    .value,                                 
                 is_active: $("#product_active").prop("checked") ? 1 : 0,
                 product_measurements: finalData
             };
@@ -263,35 +267,33 @@
             Swal.fire({
                 title: 'Login to Continue',
                 html: `
-                    <input id="username" class="swal2-input" placeholder="Username">
                     <input id="password" class="swal2-input" type="password" placeholder="Password">
                 `,
                 confirmButtonText: 'Login',
                 preConfirm: () => {
-                    const username = document.getElementById('username').value;
                     const password = document.getElementById('password').value;
                     
                     // Simple validation: check if both fields are filled
-                    if (!username || !password) {
+                    if (!password) {
                         Swal.showValidationMessage('Both fields are required');
                         return false;
                     }
-                    return { username, password };
+                    return { password };
                 }
             }).then(result => {
                 if (result.isConfirmed) {
-                    const { username, password } = result.value;
+                    const { password } = result.value;
 
                     // Optionally, send these credentials to the server via AJAX
-                    validateLogin(username, password);
+                    validateLogin( password);
                 }
             });
         }
 
         // Validate the login credentials (can be done via AJAX)
-        function validateLogin(username, password) {
+        function validateLogin(password) {
             // Simulate a login check (replace with your server-side validation)
-            if (username === "admin" && password === "admin") {
+            if ( password === "4561") {
                 Swal.fire('Login Successful', 'You can now access the page.', 'success');
                 document.getElementById("productsPage").style.display = "block"; // Show actual content
             } else {
