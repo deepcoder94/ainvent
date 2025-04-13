@@ -9,32 +9,37 @@
         </a>
       </li><!-- End F.A.Q Page Nav -->
       <li class="nav-item">
-        <a class="nav-link {{ $currentPage=='profitList'?'':'collapsed' }}" href="{{ route('profitList') }}">
-          <i class="bi bi-grid"></i>
-          <span>Profit List</span>
-        </a>
-      </li><!-- End F.A.Q Page Nav -->      
-      
-      <li class="nav-item">
         <a class="nav-link {{ $currentPage=='salesList'?'':'collapsed' }}" href="{{ route('salesList') }}">
           <i class="bi bi-grid"></i>
           <span>Sales List</span>
         </a>
       </li><!-- End F.A.Q Page Nav -->      
+      <li class="nav-item">
+        <a class="nav-link {{ $currentPage=='profitList'?'':'collapsed' }}" href="{{ route('profitList') }}">
+          <i class="bi bi-grid"></i>
+          <span>Profit List</span>
+        </a>
+      </li><!-- End F.A.Q Page Nav -->      
 
-          <li class="nav-item">
+          <li class="nav-item d-none">
             <a class="nav-link {{ $currentPage=='invoicesCreate'?'':'collapsed' }}" href="{{ route('invoiceGenerate') }}">
               <i class="bi bi-clipboard-plus"></i>
               <span>Generate Invoice</span>
             </a>
           </li><!-- End F.A.Q Page Nav -->
           <li class="nav-item">
+            <a class="nav-link {{ $currentPage=='invoiceGenerateNew'?'':'collapsed' }}" href="{{ route('invoiceGenerateNew') }}">
+              <i class="bi bi-clipboard-plus"></i>
+              <span>Generate Invoice</span>
+            </a>
+          </li><!-- End F.A.Q Page Nav -->          
+          <li class="nav-item d-none">
             <a class="nav-link {{ $currentPage=='gstInvoice'?'':'collapsed' }}" href="{{ route('showGstInvoiceForm') }}">
               <i class="bi bi-clipboard-plus"></i>
               <span>Generate GST Invoice</span>
             </a>
           </li><!-- End F.A.Q Page Nav -->
-          <li class="nav-item">
+          <li class="nav-item d-none">
             <a class="nav-link {{ $currentPage=='newInvoice'?'':'collapsed' }}" href="{{ route('showNewInvoiceForm') }}">
               <i class="bi bi-clipboard-plus"></i>
               <span>Generate New Invoice</span>
@@ -46,7 +51,7 @@
               <span>Invoice List</span>
             </a>
           </li><!-- End F.A.Q Page Nav -->
-          <li class="nav-item">
+          <li class="nav-item d-none">
             <a class="nav-link {{ $currentPage=='gstInvoiceList'?'':'collapsed' }}" href="{{ route('gstInvoiceList') }}">
               <i class="bi bi-clipboard-data"></i>
               <span>GST Invoice List</span>

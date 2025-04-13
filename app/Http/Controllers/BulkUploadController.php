@@ -138,7 +138,7 @@ class BulkUploadController extends Controller
         $handle = fopen($filePath, 'w');
 
         // Add the CSV column headings (optional)
-        fputcsv($handle, ['ID', 'Product Name', 'Product Rate', 'Is Active', 'Measurement Ids']);
+        fputcsv($handle, ['ID', 'Product Name','GST Rate', 'Product Rate', 'Is Active', 'Measurement Ids']);
 
         // Loop through the data and write each row to the CSV file
         foreach ($products as $product) {
@@ -156,6 +156,7 @@ class BulkUploadController extends Controller
             fputcsv($handle, [
                 $product->id,
                 $product->product_name,
+                $product->gst_rate,                
                 $product->product_rate,
                 $product->is_active,
                 $measurements
@@ -283,6 +284,36 @@ class BulkUploadController extends Controller
     }
 
     public function generateInventoryCsv(){
+        $inventory = Inventory::with('product')->get();
+        // Generate the filename
+        $filename = 'inventory-' . now()->timestamp . '.csv';
+
+        // Define the path where the file will be stored
+        $filePath = storage_path('app/' . $filename);
+
+        // Open the file for writing
+        $handle = fopen($filePath, 'w');
+
+        // Add the CSV column headings (optional)
+        fputcsv($handle, ['ID', 'Product Name', 'Buy Price', 'Quantity','Type']);
+
+        // Loop through the data and write each row to the CSV file
+        foreach ($inventory as $i) {
+            // Write the product row to the CSV
+            fputcsv($handle, [
+                $i->id,
+                $i->product->product_name,
+                $i->buying_price,
+                $i->total_stock,
+                'Piece'
+            ]);
+        }
+
+        // Close the file handle
+        fclose($handle);
+
+        // Return the file path so it can be used for the download
+        return response()->json(['url_path'=> route('download.customer.csv',['file'=>$filename])]);
         
     }
 }
