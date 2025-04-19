@@ -33,7 +33,7 @@ class ShipmentController extends Controller
         }
         foreach ($invoices as $i) {
             // Fetch invoice data
-            $invoice = Invoice::with('customer')->with('beat')->where('id',$i)->get();
+            $invoice = Invoice::with('customer')->with('beat')->where('id',$i)->get()->first();
             $products = InvoiceProduct::where('invoice_id', $i)->with('product')->with('measurement')->get();
 
             foreach ($products as $p) {
@@ -47,14 +47,16 @@ class ShipmentController extends Controller
                     'qty' => $p->quantity,
                     'type' => $p->measurement->name,
                     'product_description' => $p->product->product_name,
-                    'rate' => $p->product->product_rate,
-                    'amount' => $p->quantity * $p->product->product_rate * $p->measurement->quantity,
+                    'rate' => $p->rate,
+                    'amount' => $p->quantity * $p->rate * $p->measurement->quantity,
+                    'gst' => $p->gst,
                     'total_quantity' => $p->quantity * $p->measurement->quantity
                 ];
                 array_push($items, $item);
             }
 
-            $total = collect($items)->sum('amount');
+
+            $total = $invoice->invoice_total;
             $grandTotal = $total;
 
             $data = compact('items', 'total', 'grandTotal');
@@ -72,6 +74,7 @@ class ShipmentController extends Controller
             $totalq = 0;
             $pc = 0;
             $case = 0;
+            $totalgst = 0;
             $totalamount=0;
             $pro = [];
             foreach($p as $item){
@@ -79,7 +82,9 @@ class ShipmentController extends Controller
                 $pc += str_contains($item['type'],'Piece')?$item['qty']:0;
                 $case += str_contains($item['type'],'Case')?$item['qty']:0;
                 $totalamount += $item['amount'];
+                $totalgst += $item['gst'];
                 $item_code = $item['item_code'];
+                $gst = $item['gst'];
                 $product_description = $item['product_description'];                
             }
             $pro = [
@@ -88,17 +93,19 @@ class ShipmentController extends Controller
                 'case_count' =>$case,
                 'product_total_amount' =>$totalamount,
                 'item_code' =>$item_code,
+                'product_gst' =>$gst,
                 'product_description' => $product_description,
             ];
             array_push($finalitems,$pro);
         }
 
-        $shipmentTotal = collect($finalitems)->sum('product_total_amount');
+        $gstTotal = collect($finalitems)->sum('product_gst');
+        $shipmentTotal = collect($finalitems)->sum('product_total_amount') + $gstTotal;
         $shipmentCaseTotal = collect($finalitems)->sum('case_count');
         $shipmentPcTotal = collect($finalitems)->sum('piece_count');
         $shipmentQtyTotal = collect($finalitems)->sum('qty_count');
 
-        $data = compact('finalitems','shipmentTotal','shipmentCaseTotal','shipmentPcTotal','shipmentQtyTotal','currentDate');
+        $data = compact('finalitems','shipmentTotal','shipmentCaseTotal','shipmentPcTotal','shipmentQtyTotal','currentDate','gstTotal');
 
 
         $pdf = PDF::loadView('pages.shipments.pdf-format', $data);

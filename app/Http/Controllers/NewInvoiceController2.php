@@ -73,9 +73,8 @@ class NewInvoiceController2 extends Controller
             $totalgst = 0;
             $taxableamt = 0;
 
-            // dd($products);
             foreach ($products as $p) {
-                $actualRate = $this->roundUp(($p->rate * 100) / (100+$p->product->gst_rate));
+                $actualRate = $this->roundUp(($p->mrp * 100) / (100+$p->product->gst_rate));
                 $item = [
                     'qty' => $p->quantity,
                     'type' => $p->measurement->name,
@@ -164,7 +163,8 @@ class NewInvoiceController2 extends Controller
             $total = 0;
 
             $profit = 0;
-
+            $taxableamt=0;
+            $totalgst=0;
             foreach ($products as $product) {
 
                 $measurement = Measurement::where('id',$product['measurement_id'])->get()->first();
@@ -176,14 +176,17 @@ class NewInvoiceController2 extends Controller
                 $profit += ($sp-$cp)*$pqty;
 
                 $pd = Product::where('id',$product['product_id'])->get()->first();
-
+                $actualRate = $this->roundUp(($sp * 100) / (100+$pd->gst_rate));
+                $inventory = Inventory::where('product_id', $product['product_id'])->get()->first();
 
                 $data = [
                     'invoice_id' => $newInvoice->id,
                     'product_id' => $product['product_id'],
                     'measurement_id' => $product['measurement_id'],
                     'quantity' => $product['qty'],
-                    'rate' => $product['rate'],
+                    'mrp'=>$product['rate'],
+                    'gst'=>($pd->gst_rate/100)*($actualRate * $measurement->quantity * $product['qty']),
+                    'rate' => $actualRate,
                     'buying_price'=>$cp,
                     'gst_rate'=>$pd->gst_rate
                 ];
@@ -191,15 +194,18 @@ class NewInvoiceController2 extends Controller
 
                 InvoiceProduct::create($data);
                 
-                $inventory = Inventory::where('product_id', $product['product_id'])->get()->first();
                 $totalDeduction = $measurement->quantity * $product['qty'];
 
-                $rateded = $totalDeduction * $product['rate'];
+                // $rateded = $totalDeduction * $product['rate'];
 
-                $t = (($pd->gst_rate/100)*$rateded) + $rateded; 
+                $taxableamt += $actualRate * $totalDeduction;
+                $totalgst += ($pd->gst_rate/100)*($actualRate * $totalDeduction);
 
 
-                $total += $t;
+                // $t = (($pd->gst_rate/100)*$rateded) + $rateded; 
+
+
+                // $total += $t;
 
 
 
@@ -215,6 +221,7 @@ class NewInvoiceController2 extends Controller
                 ]);
 
             }
+            $total = $taxableamt + $totalgst;
             
             // InvoiceProfit::create([
             //     'invoice_number'=>$newInvoice->invoice_number,

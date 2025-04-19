@@ -94,6 +94,7 @@
                 <th>Case</th>
                 <th>Pieces</th>
                 <th>Total Qty</th>
+                <th>GST</th>
                 <th>Total Value</th>
             </tr>
         </thead>
@@ -106,6 +107,7 @@
                     <td>{{ $item['case_count'] }}</td>
                     <td>{{ $item['piece_count'] }}</td>
                     <td>{{ $item['qty_count'] }}</td>
+                    <td>{{ $item['product_gst'] }}</td>
                     <td>{{ $item['product_total_amount'] }}</td>
                 </tr>
             @endforeach
@@ -116,6 +118,7 @@
                 <td>{{ $shipmentCaseTotal }}</td>
                 <td>{{ $shipmentPcTotal }}</td>
                 <td>{{ $shipmentQtyTotal }}</td>
+                <td>{{ $gstTotal }}</td>
                 <td>{{ $shipmentTotal }}</td>
             </tr>            
         </tbody>

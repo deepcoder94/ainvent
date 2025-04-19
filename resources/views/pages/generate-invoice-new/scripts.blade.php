@@ -221,10 +221,10 @@
             isRateValid = true
         }
         
-        if(!isRateValid){
-            alert('Invalid inputs. please check once (Rate)')
-            return;
-        }        
+        // if(!isRateValid){
+        //     alert('Invalid inputs. please check once (Rate)')
+        //     return;
+        // }        
         
         let data = {
             beat_id: formValues.find((item) => item.name === "beat_id")
