@@ -16,7 +16,6 @@
     <td scope="col">
         <input type="number" value="0" class="form-control" name="qty[]" id="qty_{{$id}}" onkeyup="restrictQty('{{$id}}')">
         <span style="color:red;font-size:13px;font-weight:600" id="max_qty_span{{ $id }}">Max Quantity: </span>
-        <input type="hidden" name="maxqty[]" id="maxqty_{{$id}}" value="0">        
     </td>
     <td scope="col">
         <input type="text" value="0" class="form-control" name="rate[]" id="rate_{{$id}}" onkeyup="restrictRate('{{$id}}')">

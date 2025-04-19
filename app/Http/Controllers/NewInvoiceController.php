@@ -5,7 +5,6 @@ use App\Models\GstInvoice;
 use App\Models\GstInvoiceProduct;
 use App\Models\Inventory;
 use App\Models\InventoryHistory;
-// use App\Models\InvoiceProfit;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
@@ -14,18 +13,18 @@ use Carbon\Carbon;
 use ZipArchive;
 
 
-class GstInvoiceController extends Controller
+class NewInvoiceController extends Controller
 {
-    public function showGstInvoiceForm()
+    public function showNewInvoiceForm()
     {
-        return view('pages.generate-gst.form', ['currentPage' => 'gstInvoice']);
+        return view('pages.new-invoice.form', ['currentPage' => 'newInvoice']);
     }
-    public function generateGstInvoice(Request $request)
+    public function generateNewInvoice(Request $request)
     {
         $currentDate = Carbon::now()->format('d-m-Y'); // Format the date as you want
 
         // Create a new ZIP file in storage
-        $zipFileName = 'gst_invoice_'.$currentDate."_".time().'.zip';
+        $zipFileName = 'new_invoice_'.$currentDate."_".time().'.zip';
         $zipFilePath = storage_path('app/' . $zipFileName);
         $zip = new ZipArchive();
         // Open the zip file for writing
@@ -149,7 +148,7 @@ class GstInvoiceController extends Controller
                 ]),
                 'other_charges'=>$p['product_other_charges'],
                 'total'=>$p['product_total'],
-                'buying_price'=>$cp
+                'buying_price'=>$p['product_min_rate']
             ]);
             
         }
@@ -162,11 +161,11 @@ class GstInvoiceController extends Controller
         //     'profit_amount'=>$profit
         // ]);
 
-        $pdf = Pdf::loadView('pages.generate-gst.gst-format',$data);
+        $pdf = Pdf::loadView('pages.new-invoice.new-format',$data);
         $pdf->setPaper('A4');
         $pdfContent = $pdf->output();
         // Add the PDF to the zip with a unique filename (e.g., invoice number)
-        $zip->addFromString('gst_invoice_'.$currentDate.'.pdf', $pdfContent);        
+        $zip->addFromString('new_invoice_'.$currentDate.'.pdf', $pdfContent);        
         // Close the zip file
         $zip->close();
 
@@ -176,14 +175,14 @@ class GstInvoiceController extends Controller
         ]);
     }
 
-    public function addGstInvoiceFormProduct(Request $request,$id){
+    public function addNewInvoiceFormProduct(Request $request,$id){
         $products = Product::get();
-        return view('pages.generate-gst.add-single-product',compact('products','id'));
+        return view('pages.new-invoice.add-single-product',compact('products','id'));
     }
 
     public function list(Request $request){
-        $currentPage = 'gstInvoiceList';
-        $gst_invoices = GstInvoice::with('gst_invoice_products')->orderBy('id','desc')->get()->toArray();
+        $currentPage = 'newInvoiceList';
+        $gst_invoices = GstInvoice::with('gst_invoice_products')->get()->toArray();
         foreach($gst_invoices as $index => $i){
             $gst_invoices[$index]['supplier_details'] = json_decode($i['supplier_details'],true);
             $gst_invoices[$index]['receipent_details'] = json_decode($i['receipent_details'],true);

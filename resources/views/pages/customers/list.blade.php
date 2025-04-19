@@ -1,4 +1,7 @@
 <x-layout :currentPage="$currentPage">
+    
+    <div id="customerPage" style="display:none">
+
     <div>
         <button class="btn btn-primary mt-2 mb-2" onclick="showCreateForm()">
             Add New
@@ -67,6 +70,12 @@
             </div>
         </div>
     </section>
+    
+    
+        
+    </div>
+    
+
     <div class="modal fade" id="customerModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -392,5 +401,50 @@
             }
         });                
         }
+        
+   // Function to show the login popup with username and password fields
+        function showLoginPopup() {
+            Swal.fire({
+                title: 'Login to Continue',
+                html: `
+                    <input id="password" class="swal2-input" type="password" placeholder="Password">
+                `,
+                confirmButtonText: 'Login',
+                preConfirm: () => {
+                    const password = document.getElementById('password').value;
+                    
+                    // Simple validation: check if both fields are filled
+                    if (!password) {
+                        Swal.showValidationMessage('Both fields are required');
+                        return false;
+                    }
+                    return { password };
+                }
+            }).then(result => {
+                if (result.isConfirmed) {
+                    const { password } = result.value;
+
+                    // Optionally, send these credentials to the server via AJAX
+                    validateLogin(password);
+                }
+            });
+        }
+
+        // Validate the login credentials (can be done via AJAX)
+        function validateLogin(password) {
+            // Simulate a login check (replace with your server-side validation)
+            if (password === "4561") {
+                Swal.fire('Login Successful', 'You can now access the page.', 'success');
+                document.getElementById("customerPage").style.display = "block"; // Show actual content
+            } else {
+                Swal.fire('Invalid Credentials', 'Please check your username and password.', 'error');
+                showLoginPopup(); // Re-show the popup for retry
+            }
+        }
+
+        // Show the login popup as soon as the page loads
+        window.onload = function() {
+            showLoginPopup();
+        };         
     </script>
 </x-layout>

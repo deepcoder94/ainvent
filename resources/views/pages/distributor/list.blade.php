@@ -1,5 +1,5 @@
 <x-layout :currentPage="$currentPage">
-    <section class="section">
+    <section class="section" id="distriSection" style="display:none">
         <div class="row">
             <div class="col-lg-6">
                 @include('pages.distributor.details',['distributor'=>$distributor])
@@ -138,5 +138,50 @@
                 }
             });
         }
+        
+   // Function to show the login popup with username and password fields
+        function showLoginPopup() {
+            Swal.fire({
+                title: 'Login to Continue',
+                html: `
+                    <input id="password" class="swal2-input" type="password" placeholder="Password">
+                `,
+                confirmButtonText: 'Login',
+                preConfirm: () => {
+                    const password = document.getElementById('password').value;
+                    
+                    // Simple validation: check if both fields are filled
+                    if (!password) {
+                        Swal.showValidationMessage('Both fields are required');
+                        return false;
+                    }
+                    return { password };
+                }
+            }).then(result => {
+                if (result.isConfirmed) {
+                    const { password } = result.value;
+
+                    // Optionally, send these credentials to the server via AJAX
+                    validateLogin(password);
+                }
+            });
+        }
+
+        // Validate the login credentials (can be done via AJAX)
+        function validateLogin( password) {
+            // Simulate a login check (replace with your server-side validation)
+            if (password === "4561") {
+                Swal.fire('Login Successful', 'You can now access the page.', 'success');
+                document.getElementById("distriSection").style.display = "block"; // Show actual content
+            } else {
+                Swal.fire('Invalid Credentials', 'Please check your username and password.', 'error');
+                showLoginPopup(); // Re-show the popup for retry
+            }
+        }
+
+        // Show the login popup as soon as the page loads
+        window.onload = function() {
+            showLoginPopup();
+        };         
     </script>
 </x-layout>

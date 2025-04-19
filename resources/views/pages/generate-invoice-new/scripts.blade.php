@@ -198,7 +198,7 @@
                 groupedValues["rate[]"][i].length == 0 
             )
             {
-                alert('Invalid inputs. please try again (Empty)')
+                alert('Invalid inputs. please try again (Fields)')
                 isValid=false
                 return
             }
@@ -208,14 +208,13 @@
                 qty: groupedValues["qty[]"][i],
                 rate: groupedValues["rate[]"][i],
                 minrate: groupedValues["minrate[]"][i],
-                maxqty: groupedValues["maxqty[]"][i],                
             });
         }
         isValid=true
-        if(!isQtyValid){
-            alert('Invalid inputs. please check once (Qty)')
-            return;
-        }
+        // if(!isQtyValid){
+        //     alert('Invalid inputs. please check once (Quantity)')
+        //     return;
+        // }
 
         let is_validation_active = $("#is_validation_active").prop("checked")
         if(!is_validation_active) {
@@ -302,7 +301,7 @@
                 $("#qty_"+id).attr('data-maxqty',maxQty);
                 $("#qty_"+id).attr('data-minrate',minrate);
                 $("#minrate_"+id).val(minrate)
-                $("#maxqty_"+id).val(minrate)                
+                
                 // let measu = response.data;
                 // let meas_html = $(`#meas_${id}`);
                 // if (measu.length > 0) {
@@ -351,8 +350,7 @@
     function restrictQty(id){
         let qty = parseFloat($("#qty_"+id).val());
         let allowedqty = parseFloat($("#qty_"+id).attr('data-maxqty'));
-        
-
+                
         if(qty < allowedqty){            
             isQtyValid = true
         }   
@@ -362,6 +360,7 @@
     }
 
     function restrictRate(id){
+
         let rate = parseFloat($("#rate_"+id).val());
         let allowedminrate = parseFloat($("#qty_"+id).attr('data-minrate'));
         if(rate > allowedminrate){

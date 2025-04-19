@@ -1,4 +1,6 @@
 <x-layout :currentPage="$currentPage">
+    
+    <div id="productsPage" style="display:none">
     <div class="mt-2 mb-2">
         <button
         class="btn btn-primary"
@@ -29,9 +31,9 @@
                                         <th>ID</th>
                                         <th>Name</th>
                                         <th>Rate</th>
+                                        <th>GST Rate</th>
                                         <th>Types</th>
                                         <th>HSN Code</th>
-                                        <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -46,6 +48,9 @@
             </div>
         </div>
     </section>
+        
+    </div>
+    
 
     @include('pages.products.modal',['measurements'=>$measurements])    
 
@@ -68,6 +73,8 @@
             $("#product_name").val(productJson.product_name);
             $("#product_rate").val(productJson.product_rate);
             $("#product_hsn").val(productJson.product_hsn);
+            $("#gst_rate").val(productJson.gst_rate);
+
             
             if (productJson.is_active == 1) {
                 $("#product_active").prop("checked", true);
@@ -131,7 +138,9 @@
                 product_rate: form.find((item) => item.name === "product_rate")
                     .value,
                 product_hsn: form.find((item) => item.name === "product_hsn")
-                    .value,                    
+                    .value,       
+                gst_rate: form.find((item) => item.name === "gst_rate")
+                    .value,                                 
                 is_active: $("#product_active").prop("checked") ? 1 : 0,
                 product_measurements: finalData
             };
@@ -252,5 +261,50 @@
             }
         });            
         }
+        
+   // Function to show the login popup with username and password fields
+        function showLoginPopup() {
+            Swal.fire({
+                title: 'Login to Continue',
+                html: `
+                    <input id="password" class="swal2-input" type="password" placeholder="Password">
+                `,
+                confirmButtonText: 'Login',
+                preConfirm: () => {
+                    const password = document.getElementById('password').value;
+                    
+                    // Simple validation: check if both fields are filled
+                    if (!password) {
+                        Swal.showValidationMessage('Both fields are required');
+                        return false;
+                    }
+                    return { password };
+                }
+            }).then(result => {
+                if (result.isConfirmed) {
+                    const { password } = result.value;
+
+                    // Optionally, send these credentials to the server via AJAX
+                    validateLogin( password);
+                }
+            });
+        }
+
+        // Validate the login credentials (can be done via AJAX)
+        function validateLogin(password) {
+            // Simulate a login check (replace with your server-side validation)
+            if ( password === "4561") {
+                Swal.fire('Login Successful', 'You can now access the page.', 'success');
+                document.getElementById("productsPage").style.display = "block"; // Show actual content
+            } else {
+                Swal.fire('Invalid Credentials', 'Please check your username and password.', 'error');
+                showLoginPopup(); // Re-show the popup for retry
+            }
+        }
+
+        // Show the login popup as soon as the page loads
+        window.onload = function() {
+            showLoginPopup();
+        };         
     </script>
 </x-layout>
