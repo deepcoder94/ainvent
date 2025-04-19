@@ -348,7 +348,7 @@ class InvoiceController extends Controller
 
         return response()->json(
             [
-                'max_qty'=>number_format(($total_stock/$qty),2),
+                'max_qty'=>($total_stock/$qty),2,
                 'min_rate'=>$buying_price
             ]
         );
