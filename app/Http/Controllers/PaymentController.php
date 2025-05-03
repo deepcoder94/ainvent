@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Beat;
 use App\Models\CustomerPayment;
 use Illuminate\Http\Request;
-use App\Models\Inventory;
 use App\Models\Invoice;
-use App\Models\InvoiceProduct;
 use App\Models\PaymentHistory;
 use App\Models\Customer;
 
