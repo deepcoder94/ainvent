@@ -6,7 +6,7 @@
                     <div class="card-body tablecontainer">
                         <h5 class="card-title">Generate Invoice</h5>
 
-                        @include('pages.generate-invoice-new.invoice_form',[
+                        @include('pages.invoice.generate.form',[
                                 'beats'=>$beats,
                                 'customers'=>$customers,
                                 'products'=>$products,
@@ -28,6 +28,6 @@
             </div>
         </div>
     </section>
-    @include('pages.generate-invoice-new.scripts')
+    @include('pages.invoice.generate.scripts')
 
 </x-layout>

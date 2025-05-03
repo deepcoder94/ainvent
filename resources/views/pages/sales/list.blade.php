@@ -27,7 +27,7 @@
                                 </tr>
                             </thead>
                             <tbody id="salesbody">
-                                @include('pages.dashboard.sales-list-single',['beats'=>$beats,'payments'=>$payments])
+                                @include('pages.sales.single',['beats'=>$beats,'payments'=>$payments])
                             </tbody>
                         </table>                        
                         

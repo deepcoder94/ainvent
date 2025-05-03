@@ -211,20 +211,20 @@
             });
         }
         isValid=true
-        // if(!isQtyValid){
-        //     alert('Invalid inputs. please check once (Quantity)')
-        //     return;
-        // }
+        if(!isQtyValid){
+            alert('Invalid inputs. please check once (Quantity)')
+            return;
+        }
 
         let is_validation_active = $("#is_validation_active").prop("checked")
         if(!is_validation_active) {
             isRateValid = true
         }
         
-        // if(!isRateValid){
-        //     alert('Invalid inputs. please check once (Rate)')
-        //     return;
-        // }        
+        if(!isRateValid){
+            alert('Invalid inputs. please check once (Rate)')
+            return;
+        }        
         
         let data = {
             beat_id: formValues.find((item) => item.name === "beat_id")

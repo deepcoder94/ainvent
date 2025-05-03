@@ -100,7 +100,7 @@
                                 </tr>
                             </thead>
                             <tbody id="invoice_body">
-                                @include('pages.invoices.list-single',['invoices'=>$invoices])
+                                @include('pages.invoice.list.single',['invoices'=>$invoices])
                             </tbody>
                         </table>
 
@@ -111,5 +111,5 @@
             </div>
         </div>
     </section>
-    @include('pages.invoices.script')
+    @include('pages.invoice.list.script')
 </x-layout>

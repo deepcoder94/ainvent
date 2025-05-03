@@ -57,7 +57,7 @@ class ShipmentController extends Controller
 
 
             $total = $invoice->invoice_total;
-            $grandTotal = $total;
+            $grandTotal = round($total);
 
             $data = compact('items', 'total', 'grandTotal');
 
@@ -108,7 +108,7 @@ class ShipmentController extends Controller
         $data = compact('finalitems','shipmentTotal','shipmentCaseTotal','shipmentPcTotal','shipmentQtyTotal','currentDate','gstTotal');
 
 
-        $pdf = PDF::loadView('pages.shipments.pdf-format', $data);
+        $pdf = PDF::loadView('pages.pdf-formats.shipment', $data);
         $pdf->setPaper('A4');
         $pdfContent = $pdf->output();
 

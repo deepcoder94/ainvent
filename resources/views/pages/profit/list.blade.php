@@ -38,7 +38,7 @@
                                 </tr>
                             </thead>
                             <tbody id="salesbody">
-                                @include('pages.dashboard.profit-list-single',['groupedData'=>$groupedData])
+                                @include('pages.profit.single',['groupedData'=>$groupedData])
                             </tbody>
                         </table>                                                
                     </div>

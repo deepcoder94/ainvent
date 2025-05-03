@@ -8,9 +8,12 @@
     <td>
         @if($i->stock_action == 'add')
             <span class="badge bg-success">Added</span>                                        
+        @elseif($i->stock_action == 'return')
+            <span class="badge bg-success">Returned</span>                                                    
         @else
             <span class="badge bg-danger">Deducted</span>   
         @endif                                        
+
     </td>
     <td>{{ \Carbon\Carbon::parse($i->created_at)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s') }}</td>
 </tr>

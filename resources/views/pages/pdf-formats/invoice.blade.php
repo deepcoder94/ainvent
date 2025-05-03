@@ -115,7 +115,7 @@
                 <td>0.00</td>
                 <td>0.00</td>
                 <td>0.00</td>
-                <td class="bold">{{ $i['taxableamt'] + $i['totalgst'] }}</td>
+                <td class="bold">{{ $i['invoiceTotal'] }}</td>
             </tr>
         </tbody>
     </table>

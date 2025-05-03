@@ -84,7 +84,7 @@
 
             </div>
 
-            @include('pages.generate-invoice-new.product_table')
+            @include('pages.invoice.generate.product_table')
         
         </div>
     </div>
