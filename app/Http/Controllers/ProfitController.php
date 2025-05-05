@@ -22,8 +22,8 @@ class ProfitController extends Controller
             // For each invoice group, calculate the total profit
             $invoice = $invoiceItems->first(); // Get the first item to retrieve invoice details (like created_at)
             $totalProfit = $invoiceItems->sum(function ($item) {                
-                $sp = $this->calculateSp($item['rate'],$item['product']['gst_rate']);
-                return (($sp - $item['buying_price']) * $item['quantity']) * $item['measurement']['quantity'];
+                // $sp = $this->calculateSp($item['rate'],$item['product']['gst_rate']);
+                return (($item['buying_price'] - $item['mrp']) * $item['quantity']) * $item['measurement']['quantity'];
             });
         
             return [
@@ -79,12 +79,15 @@ class ProfitController extends Controller
     public function profitExport(){
         
 
-        $prods2 = InvoiceProduct::with('invoice')->with('measurement')->orderBy('created_at', 'desc')->get()->toArray();
+        $prods2 = InvoiceProduct::with('invoice')->with('measurement')->with('product')->orderBy('created_at', 'desc')->get()->toArray();
         $groupedData2 = collect($prods2)->groupBy('invoice_id')->map(function ($invoiceItems) {
             // For each invoice group, calculate the total profit
             $invoice = $invoiceItems->first(); // Get the first item to retrieve invoice details (like created_at)
             $totalProfit = $invoiceItems->sum(function ($item) {
-                return (($item['rate'] - $item['buying_price']) * $item['quantity']) * $item['measurement']['quantity'];
+                return (($item['buying_price'] - $item['mrp']) * $item['quantity']) * $item['measurement']['quantity'];
+
+                // $sp = $this->calculateSp($item['rate'],$item['product']['gst_rate']);
+                // return (($sp - $item['buying_price']) * $item['quantity']) * $item['measurement']['quantity'];                
             });
         
             return [
@@ -98,7 +101,6 @@ class ProfitController extends Controller
         $mergedCollection = $groupedData2;
         
         $groupedData = $mergedCollection->sortByDesc('created_at');        
-        
         // Generate the filename
         $filename = 'profits-' . now()->timestamp . '.csv';
 
