@@ -13,25 +13,27 @@ class ProfitController extends Controller
 {
     
     public function profitList(Request $request){
+        
         $perPage = 10;        
         $currentPageNum = 1;
         
-        $prods2 = InvoiceProduct::with('invoice')->with('measurement')->orderBy('created_at', 'desc')->get()->toArray();
+        $prods2 = InvoiceProduct::with('invoice')->with('measurement')->with('product')->orderBy('created_at', 'desc')->get()->toArray();
         $groupedData2 = collect($prods2)->groupBy('invoice_id')->map(function ($invoiceItems) {
             // For each invoice group, calculate the total profit
             $invoice = $invoiceItems->first(); // Get the first item to retrieve invoice details (like created_at)
-            $totalProfit = $invoiceItems->sum(function ($item) {
-                return (($item['buying_price'] - $item['rate']) * $item['quantity']) * $item['measurement']['quantity'];
+            $totalProfit = $invoiceItems->sum(function ($item) {                
+                $sp = $this->calculateSp($item['rate'],$item['product']['gst_rate']);
+                return (($sp - $item['buying_price']) * $item['quantity']) * $item['measurement']['quantity'];
             });
         
             return [
                 'created_at' => $invoice['created_at'], // You can take created_at from any item in the group
                 'gst_invoice_id' => $invoice['invoice_id'],
-                'total_profit' => $totalProfit,
+                'total_profit' => round($totalProfit),
                 'invoice_number' => $invoice['invoice']['invoice_number'], // Invoice number
             ];
         });        
-        
+
         $mergedCollection = $groupedData2;
         
         $groupedData = $mergedCollection->sortByDesc('created_at');
@@ -58,11 +60,21 @@ class ProfitController extends Controller
         }
         
 
-        $groupedData = $mergedCollection->take($perPage)->skip($currentPageNum)->all();
+        $groupedData = $mergedCollection->all();
 
         return view($view,compact('currentPage','groupedData','perPage','currentPageNum','total_records','totalpagnums'));
 
     }
+
+    public function calculateSp($actualRate, $gst_rate) {
+        $sp = ($actualRate * (100 + $gst_rate)) / 100;
+        return round($sp,0); // Apply rounding to the result
+    }
+    
+    public function roundUp($number, $precision = 2) {
+        $factor = pow(10, $precision);
+        return ceil($number * $factor) / $factor;
+    }    
     
     public function profitExport(){
         
