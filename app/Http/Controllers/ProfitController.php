@@ -20,17 +20,21 @@ class ProfitController extends Controller
         $prods2 = InvoiceProduct::with('invoice')->with('measurement')->with('product')->orderBy('created_at', 'desc')->get()->toArray();
         $groupedData2 = collect($prods2)->groupBy('invoice_id')->map(function ($invoiceItems) {
             // For each invoice group, calculate the total profit
-            $invoice = $invoiceItems->first(); // Get the first item to retrieve invoice details (like created_at)
-            $totalProfit = $invoiceItems->sum(function ($item) {                
-                // $sp = $this->calculateSp($item['rate'],$item['product']['gst_rate']);
-                return (($item['buying_price'] - $item['mrp']) * $item['quantity']) * $item['measurement']['quantity'];
-            });
+            $profit = 0;
+            foreach($invoiceItems as $i){
+                $profit += ($i['mrp'] - $i['buying_price']) * $i['quantity'] * $i['measurement']['quantity'];
+            }
+            // $invoice = $invoiceItems->first(); // Get the first item to retrieve invoice details (like created_at)
+            // $totalProfit = $invoiceItems->sum(function ($item) {                
+            //     // $sp = $this->calculateSp($item['rate'],$item['product']['gst_rate']);
+            //     return (($item['buying_price'] - $item['mrp']) * $item['quantity']) * $item['measurement']['quantity'];
+            // });
         
             return [
-                'created_at' => $invoice['created_at'], // You can take created_at from any item in the group
-                'gst_invoice_id' => $invoice['invoice_id'],
-                'total_profit' => round($totalProfit),
-                'invoice_number' => $invoice['invoice']['invoice_number'], // Invoice number
+                'created_at' => $invoiceItems[0]['created_at'], // You can take created_at from any item in the group
+                'gst_invoice_id' => $invoiceItems[0]['invoice_id'],
+                'total_profit' => round($profit),
+                'invoice_number' => $invoiceItems[0]['invoice']['invoice_number'], // Invoice number
             ];
         });        
 
