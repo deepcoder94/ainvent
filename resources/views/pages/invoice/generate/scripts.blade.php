@@ -13,8 +13,8 @@
     function getCustomers() {
         clearInputErrors('invalid_beat');
         let beatId = parseInt($("#beat_id").val());
+        let  url = '{{ route("beats.customers", ":id") }}'.replace(':id', beatId);
 
-        let url = '{{ url('getCustomersByBeat') }}/'+beatId;
         $.ajax({
             url: url, // The URL defined in your routes
             type: "GET",
@@ -51,8 +51,8 @@
         productNumber++;
 
         $("#no_item").hide();
+        let  url = '{{ route("invoice.create.single_product", ":id") }}'.replace(':id', lastProductId);
         
-        let url = '{{ url('loadSingleProduct') }}/'+lastProductId;
         $.ajax({
             url: url, // The URL defined in your routes
             type: "GET",
@@ -74,7 +74,8 @@
     function getProductTypes(event,id){
         let selectedProduct = event.target.value;
 
-        let url = '{{ url('getMeasurementsByProduct') }}/'+selectedProduct;
+        let  url = '{{ route("product.measurements", ":id") }}'.replace(':id', selectedProduct);
+
         $.ajax({
             url: url, // The URL defined in your routes
             type: "GET",
@@ -235,8 +236,8 @@
             products: finalData,
         };
                     
+        let  url = '{{ route("invoice.create") }}';
 
-        let url = $("#store_url").val();
         $.ajax({
             url: url, // The URL defined in your routes
             type: "POST",
@@ -277,8 +278,10 @@
         //selected type
         let selected_type = $("#meas_"+id).val();
 
+        let url = "{{ route('product.max_qty', ['id' => '__id__', 'typeId' => '__type__']) }}"
+                .replace('__id__', selected_pro)
+                .replace('__type__', selected_type);
 
-        let url = '{{ url('getMaxQtyByTypeAndProduct') }}/'+selected_type+'/'+selected_pro;
         $.ajax({
             url: url, // The URL defined in your routes
             type: "GET",
@@ -301,18 +304,7 @@
                 $("#qty_"+id).attr('data-maxqty',maxQty);
                 $("#qty_"+id).attr('data-minrate',minrate);
                 $("#minrate_"+id).val(minrate)
-                
-                // let measu = response.data;
-                // let meas_html = $(`#meas_${id}`);
-                // if (measu.length > 0) {
-                //     let meahtml = '';
-                //     let selectProdcts = measu.map((mea) => {
-                //         meahtml += `<option value="${mea.id}">${mea.name}</option>`;
-                //     });
-                //     meas_html.html(meahtml);
-                //     meas_html.trigger('change');
-                // }
-                
+                                
             },
             error: function (xhr, status, error) {                
                 // alert(xhr.responseJSON.message);
@@ -320,31 +312,6 @@
         });
 
 
-
-
-        // // selected qty
-
-        // let products = $("#products").val();
-        // let productJson = JSON.parse(products);
-        
-        // let prod =productJson.filter((j)=>{
-        //     return j.id == selected_pro
-        // })
-
-        
-        
-        // let totalstock = prod[0].inventory.total_stock
-
-        // let minrate = prod[0].inventory.buying_price;
-
-        // let type_qty = prod[0].measurements.filter((m)=>{
-        //     return m.id == selected_type
-        // })
-        // type_qty = type_qty[0].quantity
-
-        // let maxQty = (totalstock/type_qty).toFixed(2);
-
-                
     }
 
     function restrictQty(id){

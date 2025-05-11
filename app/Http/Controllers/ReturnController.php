@@ -13,7 +13,8 @@ use Illuminate\Http\Request;
 class ReturnController extends Controller
 {
     public $count =0;
-    public function showReturnForm(){
+
+    public function list(){
         $invoices = Invoice::all();
         
         $currentPage = 'returns';
@@ -24,12 +25,15 @@ class ReturnController extends Controller
         return view('pages.returns.form', $data);        
     }
 
-    public function getInvoiceProducts(Request $request,$id,$index){
+
+
+
+    public function view(Request $request,$id,$index){
         $invoices = Invoice::where('id',$id)->with('invoiceproducts')->with('invoicemeasurements')->get()->first();
         return view('pages.returns.new-return-product',['products'=>$invoices->invoiceproducts,'count'=>$index,'measurements'=>$invoices->invoicemeasurements[0]]);
     }
 
-    public function submitReturn(Request $request){
+    public function store(Request $request){
         
         try{
 

@@ -24,8 +24,7 @@
                   </div>                  
 
               </div>                      
-              <input type="hidden" id="store_url" value="{{ route('beats.store') }}">
-              <input type="hidden" id="edit_url" value="">
+              <input type="hidden" id="edit_id" value="">
 
 
           </form><!-- Vertical Form -->               

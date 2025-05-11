@@ -18,55 +18,8 @@ class DistributorController extends Controller
         return view('pages.distributor.list',['currentPage'=>'distributor','distributor'=>$dist,'measurements'=>$measurements]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Distributor $distributor)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Distributor $distributor)
-    {
-        
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Distributor $distributor)
-    {
-
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Distributor $distributor)
-    {
-        //
-    }
-
-    public function updateCompany(Request $request){
+    public function update(Request $request){
         $request->validate([
             'name'=>'required|string|max:255',
             'address'=>'required|string|max:255',
@@ -88,71 +41,5 @@ class DistributorController extends Controller
 
     }
 
-    public function createMeasurement(Request $request){
-        try {
-            $validated = $request->validate([
-                'name'    => 'required|string|max:255',
-                'quantity' => 'required|string',
-            ]);
-
-            $beat = Measurement::create([
-                'name'    => $request->name,
-                'quantity' => $request->quantity,
-            ]);
-            $success = true;
-            $message = 'Measurement saved successfully';
-
-        } catch (\Exception $e) {
-            $success = false;
-            $message = $e->getMessage();
-        }
-        return response()->json([
-            'success' => $success,
-            'message' => $message,
-        ]);
-    }
-
-    public function updateMeasurementById(Request $request,$id){
-        try {
-            $validated = $request->validate([
-                'name'    => 'required|string|max:255',
-                'quantity' => 'required|string',
-            ]);
-            $resource = Measurement::findOrFail($id);
-
-            $beat = $resource->update([
-                'name'    => $request->name,
-                'quantity' => $request->quantity,
-            ]);
-            $success = true;
-            $message = 'Measurement updated successfully';
-
-        } catch (\Exception $e) {
-            $success = false;
-            $message = $e->getMessage();
-        }
-        return response()->json([
-            'success' => $success,
-            'message' => $message,
-        ]);
-
-    }
-    
-    public function deleteMeasurementById(Request $request,$id){
-        $measurement = Measurement::find($id);
-        // If the resource doesn't exist, return an error response
-        if (! $measurement) {
-            return response()->json([
-                'message' => 'Resource not found.',
-            ], 404);
-        }
-
-        $measurement->delete();
-        // Return a success response
-        return response()->json([
-            'message' => 'Resource deleted successfully.',
-        ]);
-    }
-    
 
 }

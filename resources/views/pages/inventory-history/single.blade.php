@@ -1,10 +1,10 @@
 
 @forelse ( $inventoryHistory as $i )
 <tr>
-    <td>{{ $i->product->product_name }}</td>
-    <td>{{ $i->measurement->name }}</td>
-    <td>{{ $i->stock_out_in }}</td>
-    <td>{{ $i->buying_price }}</td>
+    <td>{{ $i->product->product_name ?? '-' }}</td>
+    <td>{{ $i->measurement->name ?? '-' }}</td>
+    <td>{{ $i->stock_out_in ?? '-' }}</td>
+    <td>{{ $i->buying_price ?? '-' }}</td>
     <td>
         @if($i->stock_action == 'add')
             <span class="badge bg-success">Added</span>                                        

@@ -16,7 +16,7 @@ class ShipmentController extends Controller
 {
 
 
-    public function createShipment(Request $request)
+    public function store(Request $request)
     {
         $invoices = $request->input('selectedInvoices');
 
@@ -120,22 +120,11 @@ class ShipmentController extends Controller
 
         // Prepare the zip file for download
         return response()->json([
-            'zipUrl' => route('downloadZip', ['file' => $zipFileName])
+            'zipUrl' => route('export.csv', ['file' => $zipFileName])
         ]);
     }
 
-    public function downloadZip($file)
-    {
-        $path = storage_path('app/' . $file);
-
-        if (!file_exists($path)) {
-            abort(404);
-        }
-
-        return response()->download($path)->deleteFileAfterSend(true);
-    }
-
-    public function shipmentList()
+    public function list()
     {
         $invoices = Invoice::with('customer')->with('beat')->orderBy('id','desc')->get();
         $data = [];

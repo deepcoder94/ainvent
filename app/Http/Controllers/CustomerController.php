@@ -3,18 +3,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Beat;
 use App\Models\Customer;
-use App\Models\CustomerPayment;
 use Illuminate\Http\Request;
-use App\Models\Inventory;
-use App\Models\Invoice;
-use App\Models\InvoiceProduct;
 
 class CustomerController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function list()
     {
         $customers = Customer::with('beat')->with('payments')->get();
         $beats     = Beat::get();
@@ -22,13 +18,14 @@ class CustomerController extends Controller
 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function view(Request $request, $id)
     {
-        //
-    }
+        $resource = Customer::findOrFail($id);
+        return response()->json([
+            'data' => $resource,
+            'message' => 'Data fetched',
+        ]);        
+    }    
 
     /**
      * Store a newly created resource in storage.
@@ -66,39 +63,8 @@ class CustomerController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Customer $customer)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Customer $customer)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Customer $customer)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Customer $customer)
-    {
-        //
-    }
-
-    public function updateCustomerById(Request $request, $id)
+    public function edit(Request $request, $id)
     {
         try {
             $validated = $request->validate([
@@ -132,7 +98,7 @@ class CustomerController extends Controller
         ]);
     }
 
-    public function deleteCustomerById(Request $request, $id)
+    public function delete(Request $request, $id)
     {
         $beat = Customer::find($id);
         // If the resource doesn't exist, return an error response
@@ -150,7 +116,7 @@ class CustomerController extends Controller
         ]);
     }
 
-    public function searchCustomer(Request $request){
+    public function search(Request $request){
 
         $beatSearch =$request->input('beatSearch');
         $searchField =$request->input('searchField');

@@ -36,18 +36,8 @@ class InvoiceListController extends Controller
         return view('pages.invoice.list.layout', ['currentPage' => 'invoicesList', 'invoices' => $invoices,'customers'=>$customers,'beats'=>$beats,'pages'=>$pages]);
     }
 
-    public function downloadZip($file)
-    {
-        $path = storage_path('app/' . $file);
 
-        if (!file_exists($path)) {
-            abort(404);
-        }
-
-        return response()->download($path)->deleteFileAfterSend(true);
-    }
-
-    public function loadPdfNew(Request $request)
+    public function print(Request $request)
     {
         $invoices = $request->input('selectedInvoices');
         $currentDate = Carbon::now()->format('d-m-Y'); // Format the date as you want
@@ -131,7 +121,7 @@ class InvoiceListController extends Controller
 
         // Prepare the zip file for download
         return response()->json([
-            'zipUrl' => route('downloadZip', ['file' => $zipFileName])
+            'zipUrl' => route('export.csv', ['file' => $zipFileName])
         ]);
     }
 
@@ -141,7 +131,7 @@ class InvoiceListController extends Controller
     }
         
 
-    public function searchInvoice(Request $request){
+    public function search(Request $request){
         $invId =$request->input('invId');
         $invDate =$request->input('invDate');
         $invCustomer =$request->input('invCustomer');
@@ -171,7 +161,7 @@ class InvoiceListController extends Controller
 
     }
 
-    public function invoiceView(Request $request,$id){
+    public function view(Request $request,$id){
         $invoice = Invoice::with('customer')->with('beat')->find($id);
         $products = InvoiceProduct::where('invoice_id', $id)->with('product')->with('measurement')->get();
 
@@ -179,7 +169,7 @@ class InvoiceListController extends Controller
         foreach ($products as $p) {
             $item = [
                 'qty' => $p->quantity,
-                'type' => $p->measurement->name,
+                'type' => $p->measurement->name??'-',
                 'product_description' => $p->product->product_name,
                 'rate' => $p->rate,
                 'amount' => $p->quantity * $p->rate * $p->measurement->quantity
@@ -203,5 +193,10 @@ class InvoiceListController extends Controller
         return view('pages.pdf-formats.return-invoice',$invoicesArray);
 
     }
+
+    public function products(Request $request,$id,$index){
+        $invoices = Invoice::where('id',$id)->with('invoiceproducts')->with('invoicemeasurements')->get()->first();
+        return view('pages.returns.new-return-product',['products'=>$invoices->invoiceproducts,'count'=>$index,'measurements'=>$invoices->invoicemeasurements[0]]);
+    }    
 
 }

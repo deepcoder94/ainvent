@@ -45,7 +45,7 @@
         });
         if (selectedInvoices.length > 0) {
             $.ajax({
-                url: "{{ route('loadPdfNew') }}", // The URL defined in your routes
+                url: "{{ route('invoice.print') }}", // The URL defined in your routes
                 type: "POST",
                 headers: {
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(

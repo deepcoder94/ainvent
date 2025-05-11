@@ -1,40 +1,57 @@
 <script>
     function showCreateForm() {
-        $("#edit_url").val("");
+        $("#edit_id").val("");
         $("#customer_form")[0].reset();
 
         $("#modal-title").html("Create Customer");
         $("#customerModal").modal("show");
     }
 
-    function showEditForm(customer, edit_url) {
-        $("#edit_url").val("");
-        $("#customer_form")[0].reset();
-        let customerJson = JSON.parse(customer);
+    function showEditForm(id) {
+        $("#edit_id").val("");
+        let url = '{{ route("customer.view", ":id") }}'.replace(':id', id);
 
-        $("#modal-title").html("Edit Customer");
-        $("#edit_url").val(edit_url);
-        $("#customer_name").val(customerJson.customer_name);
-        $("#customer_address").val(customerJson.customer_address);
-        $("#customer_gst").val(customerJson.customer_gst);
-        $("#customer_phone").val(customerJson.customer_phone);
+        $.ajax({
+            url: url, // The URL defined in your routes
+            type: "GET",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                    "content"
+                ), // CSRF Token
+            },
+            success: function (response) {
+                $("#customer_form")[0].reset();
 
-        if (customerJson.is_active == 1) {
-            $("#customer_active").prop("checked", true);
-        } else {
-            $("#customer_active").prop("checked", false);
-        }
-        $("#beat_id").val(customerJson.beat_id);
-        $("#customerModal").modal("show");
+                $("#modal-title").html("Edit Customer");
+                $("#customer_name").val(response.data.customer_name);
+                $("#customer_address").val(response.data.customer_address);
+                $("#customer_gst").val(response.data.customer_gst);
+                $("#customer_phone").val(response.data.customer_phone);
+
+                if (response.data.is_active == 1) {
+                    $("#customer_active").prop("checked", true);
+                } else {
+                    $("#customer_active").prop("checked", false);
+                }
+                $("#beat_id").val(response.data.beat_id);
+                $("#edit_id").val(id);
+
+                $("#customerModal").modal("show");
+                
+            }
+        })
     }
 
     function submitCustomerForm() {
         let form = $("#customer_form").serializeArray();
 
-        let isEdit = $("#edit_url").val();
-        let url = $("#store_url").val();
+        let isEdit = $("#edit_id").val();
+        let url='';
         if (isEdit.length > 0) {
-            url = $("#edit_url").val();
+            url = '{{ route("customer.edit", ":id") }}'.replace(':id', isEdit);
+        }
+        else{
+            url = '{{ route("customer.store") }}';        
         }
 
         let data = {
@@ -76,8 +93,10 @@
             },
         });
     }
-    function showDeleteConfirmationDialog(id, url) {
+    function showDeleteConfirmationDialog(id) {
         // Show SweetAlert confirmation dialog
+        let  url = '{{ route("customer.delete", ":id") }}'.replace(':id', id);
+
         Swal.fire({
             title: "Are you sure?",
             text: "Do you want to delete this Customer?",
@@ -154,7 +173,7 @@
 
             // Send the file to the server using AJAX
             $.ajax({
-                url: "{{ route('customer.upload') }}",
+                url: "{{ route('import.customer') }}",
                 method: 'POST',
                 data: formData,
                 headers: {
@@ -180,7 +199,7 @@
 
     function exportCustomers(){
         $.ajax({
-        url: "{{ route('generate.customer.csv') }}", // The route to your export method
+        url: "{{ route('export.customer') }}", // The route to your export method
         type: 'GET',
         headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(

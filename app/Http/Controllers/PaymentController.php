@@ -11,14 +11,14 @@ use App\Models\Customer;
 
 class PaymentController extends Controller
 {
-    public function paymentsList(){
+    public function list(){
         $customerpayments=[];
         $beats     = Beat::get();
         return view('pages.payments.list', ['currentPage' => 'customer_payments', 'customerpayments' => $customerpayments, 'beats' => $beats]);
 
     }
 
-    public function paymentsUpdate(Request $request,$id){
+    public function edit(Request $request,$id){
         try{
 
             $invoiceid = $request->invoiceid;
@@ -66,30 +66,35 @@ class PaymentController extends Controller
 
     }
 
-    public function getPaymentsByBeat(Request $request,$beatId){
-        // $customerpayments = CustomerPayment::with('customer')->where('')->get();
-       $customerpayments =  CustomerPayment::with('customer')->with('invoice')
-    ->whereHas('customer', function ($query) use ($beatId) {
-        $query->where('beat_id', $beatId);
-    })
-    ->where('total_due','>',0)
-    ->get();
-    return view('pages.payments.customer-single',['customerpayments'=>$customerpayments]);
+    public function view(Request $request,$type,$id){
+        if($type == 'beat'){
+            $customerpayments =  CustomerPayment::with('customer')->with('invoice')
+            ->whereHas('customer', function ($query) use ($id) {
+                $query->where('beat_id', $id);
+            })
+            ->where('total_due','>',0)
+            ->get();
+            return view('pages.payments.customer-single',['customerpayments'=>$customerpayments]);        
+        }
+        if($type == 'invoice'){
+            $inv = Invoice::where('invoice_number',$id)->get()->first();
+            if(empty($inv)){
+                return view('pages.payments.invoice-single',['customerpayments'=>[]]);            
+            }
+            $id = $inv->id;
+    
+            $customerpayments =  CustomerPayment::with('customer')->with('invoice')
+            ->whereHas('customer', function ($query) use ($id) {
+                $query->where('invoice_id', $id);
+            })
+            ->where('total_due','>',0)
+            ->get()->first();
+            return view('pages.payments.invoice-single',['customerpayments'=>$customerpayments]);
+
+        }
     }
 
     public function getPaymentsByInvoiceId(Request $request,$invoiceId){
-        $inv = Invoice::where('invoice_number',$invoiceId)->get()->first();
-        if(empty($inv)){
-            return view('pages.payments.invoice-single',['customerpayments'=>[]]);            
-        }
-        $id = $inv->id;
-
-        $customerpayments =  CustomerPayment::with('customer')->with('invoice')
-        ->whereHas('customer', function ($query) use ($id) {
-            $query->where('invoice_id', $id);
-        })
-        ->where('total_due','>',0)
-        ->get()->first();
     
         // $invoice = Invoice::with('customer')->with('beat')->where('invoice_number',$invoiceId)->get()->first();
         // $data = [];
@@ -121,42 +126,8 @@ class PaymentController extends Controller
         //     $data['invoice_id'] = $invoice->id;
         //     $data['customer_id'] = $invoice->customer->id;
         // }
-        return view('pages.payments.invoice-single',['customerpayments'=>$customerpayments]);
 
 
     }
 
-    public function paymentHistory(){
-        $currentPage = 'payment_history';
-        $invoices = Invoice::with('payments')->with('customer')->orderBy('id','desc')->get()->toArray();
-    // Convert the array into a collection
-    $invoicesCollection = collect($invoices);
-
-    // Filter the invoices to keep only those that have at least one payment
-    $filteredInvoices = $invoicesCollection->filter(function ($invoice) {
-        return count($invoice['payments']) > 0;
-    });
-        return view('pages.payment-history.list',compact('currentPage','filteredInvoices'));
-    }
-
-    public function getSingleInvoicePaymentDetail(Request $request,$id){
-        $history = PaymentHistory::where('invoice_id',$id)->get();
-        return view('pages.payment-history.single-invoice-history',compact('history'));
-    }
-
-    public function searchPayHistory(Request $request,$id){
-        $query = Invoice::query();
-        if($id !='all'){
-            $query->where('invoice_number',$id);
-        }
-        $invoices = $query->with('payments')->with('customer')->orderBy('id','desc')->get()->toArray();
-        // Convert the array into a collection
-        $invoicesCollection = collect($invoices);
-
-        // Filter the invoices to keep only those that have at least one payment
-        $filteredInvoices = $invoicesCollection->filter(function ($invoice) {
-            return count($invoice['payments']) > 0;
-        });        
-        return view('pages.payment-history.single-payment',compact('filteredInvoices'));
-    }
 }

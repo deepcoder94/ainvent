@@ -2,25 +2,39 @@
 
 
 
-    function showEditForm(beat, edit_url) {
-        $("#edit_url").val("");
-        $("#beat_form")[0].reset();
-        let beatJson = JSON.parse(beat);
+    function showEditForm(id) {
+        let url = '{{ route("beats.view", ":id") }}'.replace(':id', id);
+        $.ajax({
+            url: url, // The URL defined in your routes
+            type: "GET",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                    "content"
+                ), // CSRF Token
+            },
+            success: function (response) {
+                $("#edit_id").val("");
+                $("#beat_form")[0].reset();
 
-        $("#modal-title").html("Edit Beat");
-        $("#edit_url").val(edit_url);
-        $("#beat_name").val(beatJson.beat_name);
-        $("#beat_address").val(beatJson.beat_address);
-        if (beatJson.is_active == 1) {
-            $("#beat_active").prop("checked", true);
-        } else {
-            $("#beat_active").prop("checked", false);
-        }
-        $("#beatModal").modal("show");
+                $("#modal-title").html("Edit Beat");
+                $("#edit_id").val(id);
+                $("#beat_name").val(response.data.beat_name);
+                $("#beat_address").val(response.data.beat_address);
+                if (response.data.is_active == 1) {
+                    $("#beat_active").prop("checked", true);
+                } else {
+                    $("#beat_active").prop("checked", false);
+                }
+                $("#beatModal").modal("show");
+                
+            }
+        })
+        // let beatJson = JSON.parse(beat);
+
     }
 
     function showCreateForm() {
-        $("#edit_url").val("");
+        $("#edit_id").val("");
         $("#beat_form")[0].reset();
 
         $("#modal-title").html("Create Beat");
@@ -30,12 +44,16 @@
     function submitBeatForm() {
         let form = $("#beat_form").serializeArray();
 
-        let isEdit = $("#edit_url").val();
-        let url = $("#store_url").val();
+        let isEdit = $("#edit_id").val();
+        let url = '';
         if (isEdit.length > 0) {
-            url = $("#edit_url").val();
+            let id = $("#edit_id").val();
+            url = '{{ route("beats.edit", ":id") }}'.replace(':id', id);
         }
-
+        else{
+            url = '{{ route("beats.store") }}';
+        }
+        
         let data = {
             beat_name: form.find((item) => item.name === "beat_name").value,
             beat_address: form.find((item) => item.name === "beat_address")
@@ -67,7 +85,7 @@
         });
     }
 
-    function showDeleteConfirmationDialog(id, url) {
+    function showDeleteConfirmationDialog(id) {
         // Show SweetAlert confirmation dialog
         Swal.fire({
             title: "Are you sure?",
@@ -79,6 +97,8 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 // If confirmed, proceed with AJAX request to delete the resource
+                let url = '{{ route("beats.delete", ":id") }}'.replace(':id', id);
+
                 $.ajax({
                     url: url, // Your route to delete the resource
                     type: "POST",

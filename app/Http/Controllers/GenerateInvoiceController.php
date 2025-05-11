@@ -15,7 +15,7 @@ use App\Models\InventoryHistory;
 
 class GenerateInvoiceController extends Controller
 {
-    public function index()
+    public function list()
     {
         $customers   = Customer::get();
         $beats       = Beat::get();
@@ -119,15 +119,7 @@ class GenerateInvoiceController extends Controller
     }
     
     
-    public function getMeasurementsByProduct(Request $request,$id){
-        $products    = Product::with('measurements')->with('inventory')->where('id',$id)->get()->first();
-
-        return response()->json([
-            'data'=>$products->measurements
-        ]);
-    }
-
-    public function loadSingleProduct(Request $request,$id){
+    public function single_product(Request $request,$id){
         $products    = Product::with('measurements')->with('inventory')->get();
         $filteredProds = [];
         foreach($products as $p){
@@ -140,29 +132,4 @@ class GenerateInvoiceController extends Controller
         return view('pages.invoice.generate.product-single',compact('filteredProds','measurement','id'));
     }    
 
-    public function getCustomersByBeat(Request $request,$id){
-        $customers   = Customer::where('beat_id',$id)->get();
-        return response()->json([
-            'customers'=>$customers
-        ]);
-    }
-
-    public function getMaxQtyByTypeAndProduct(Request $req,$typeId,$productId){
-        $products    = Product::with('measurements')->with('inventory')->where('id',$productId)->get()->first();        
-
-        $total_stock = $products->inventory->total_stock;
-        $buying_price = $products->inventory->buying_price; // Min rate
-
-        $measurement = $products->measurements;
-        $qty = collect($measurement)->filter(function($value) use ($typeId){
-            return $value->id == $typeId;
-        })->first()->quantity;
-
-        return response()->json(
-            [
-                'max_qty'=>($total_stock/$qty),2,
-                'min_rate'=>$buying_price
-            ]
-        );
-    }    
 }

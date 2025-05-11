@@ -12,12 +12,12 @@
             />
         </div>
     </td>
-    <td>{{ $invoice['invoice']->invoice_number }}</td>
+    <td>{{ $invoice['invoice']->invoice_number ?? '-' }}</td>
     <td>
-        {{ $invoice['invoice']->customer->customer_name }}
+        {{ $invoice['invoice']->customer->customer_name ?? '-' }}
     </td>
     <td>
-        {{ $invoice['invoice']->beat->beat_name }}
+        {{ $invoice['invoice']->beat->beat_name ?? '-' }}
     </td>
     <td>
         {{ \Carbon\Carbon::parse($invoice['invoice']->created_at)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s') }}

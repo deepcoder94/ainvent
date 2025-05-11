@@ -4,100 +4,228 @@ use App\Http\Controllers\BeatController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DistributorController;
+use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\InventoryHistoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\BulkUploadController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GenerateInvoiceController;
+use App\Http\Controllers\ImportController;
 use App\Http\Controllers\InvoiceListController;
+use App\Http\Controllers\InvoiceRequestController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaymentHistoryController;
+
 use App\Http\Controllers\ProfitController;
 use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\SalesController;
 
-Route::get('/', [DashboardController::class,'index'])->name('index');
-Route::get('/dashboard', [DashboardController::class,'index'])->name('dashboard');
-Route::get('/sales/list', [SalesController::class,'salesList'])->name('salesList');
-Route::get('/searchSales', [SalesController::class,'searchSales'])->name('searchSales');
-
-Route::get('/profit/list', [ProfitController::class,'profitList'])->name('profitList');
-Route::get('/profitexport', [ProfitController::class,'profitExport'])->name('profitExport');
 
 
-Route::resources([
-    'distributor'=>DistributorController::class,
-    'beats'=>BeatController::class,
-    'customer'=>CustomerController::class,
-    'products'=>ProductController::class,
-    'inventory'=>InventoryController::class
-]);
+Route::controller(DashboardController::class)->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/dashboard', 'index')->name('dashboard');    
+});
 
-Route::post('/updateCompany',[DistributorController::class,'updateCompany'])->name('updateCompany');
+Route::name('sales.')->group(function () {
+    Route::controller(SalesController::class)->group(function () {
+        Route::prefix('sales')->group(function () {
+            Route::get('/list', 'list')->name('list');
+            Route::get('/search', 'search')->name('search');
+        });
+    });
+});
+
+Route::name('profit.')->group(function () {
+    Route::controller(ProfitController::class)->group(function () {
+        Route::prefix('profit')->group(function () {
+            Route::get('/list', 'list')->name('list');
+            Route::get('/export', 'export')->name('export');
+        });
+    });
+});
+
+Route::name('measurement.')->group(function () {
+    Route::controller(MeasurementController::class)->group(function () {
+        Route::prefix('measurement')->group(function () {
+            Route::post('/create', 'create')->name('create');
+            Route::get('/view/{id}', 'view')->name('view');
+            Route::post('/edit/{id}', 'update')->name('update');
+            Route::post('/delete/{id}', 'delete')->name('delete');
+        });    
+    });
+});    
+
+Route::name('distributor.')->group(function () {
+    Route::controller(DistributorController::class)->group(function () {
+        Route::prefix('distributor')->group(function () {
+            Route::get('/list', 'index')->name('index');
+            Route::post('/update','update')->name('update');
+        });
+    });
+});
+
+Route::name('beats.')->group(function () {
+    Route::controller(BeatController::class)->group(function () {
+        Route::prefix('beats')->group(function () {
+            Route::get('/list', 'list')->name('list');
+            Route::post('/store', 'store')->name('store');
+            Route::get('/view/{id}', 'view')->name('view');
+            Route::post('/edit/{id}', 'edit')->name('edit');
+            Route::post('/delete/{id}', 'delete')->name('delete');
+            Route::get('/{id}/customers', 'customers')->name('customers');
+
+        });    
+    });    
+});
+
+Route::name('customer.')->group(function () {
+    Route::controller(CustomerController::class)->group(function () {
+        Route::prefix('customer')->group(function () {
+            Route::get('/list', 'list')->name('list');
+            Route::get('/view/{id}', 'view')->name('view');
+            Route::post('/store', 'store')->name('store');
+            Route::post('/edit/{id}', 'edit')->name('edit');
+            Route::post('/delete/{id}', 'delete')->name('delete');
+            Route::get('/search', 'search')->name('search');
+
+        });    
+    });
+});
+
+Route::name('product.')->group(function () {
+    Route::controller(ProductController::class)->group(function () {
+        Route::prefix('products')->group(function () {
+            Route::get('/list', 'list')->name('list');
+            Route::post('/store', 'store')->name('store');
+            Route::get('/view/{id}', 'view')->name('view');
+            Route::post('/delete/{id}', 'delete')->name('delete');
+            Route::post('/edit/{id}', 'edit')->name('edit');
+
+            Route::get('/{id}/measurements', 'measurements')->name('measurements');
+            Route::get('/{id}/{typeId}/max_qty', 'max_qty')->name('max_qty');
+
+        });    
+    });
+});
+
+Route::name('inventory.')->group(function () {
+    Route::controller(InventoryController::class)->group(function () {
+        Route::prefix('inventory')->group(function () {
+            Route::get('/list', 'list')->name('list');
+            Route::post('/store', 'store')->name('store');
+        });    
+    });
+    Route::controller(InventoryHistoryController::class)->group(function () {
+        Route::prefix('inventory/history')->group(function () {
+            Route::get('/list', 'list')->name('history.list');
+            Route::get('/listWithPaginate', 'listWithPaginate')->name('history.listWithPaginate');
+        });    
+    });    
+});
+
+Route::name('shipment.')->group(function () {
+    Route::controller(ShipmentController::class)->group(function () {
+        Route::prefix('shipment')->group(function () {
+            Route::get('/list', 'list')->name('list');
+            Route::post('/store', 'store')->name('store');
+        });    
+    });    
+});
+
+Route::name('payment.')->group(function () {
+    Route::controller(PaymentController::class)->group(function () {
+        Route::prefix('payment')->group(function () {
+            Route::get('/list', 'list')->name('list');
+            Route::get('/view/{type}/{id}', 'view')->name('view');
+            Route::post('/edit/{id}', 'edit')->name('edit');
+        });    
+    });    
+
+    Route::controller(PaymentHistoryController::class)->group(function () {
+        Route::prefix('payment/history')->group(function () {
+            Route::get('/list', 'list')->name('history.list');
+            Route::get('/view/{id}', 'view')->name('history.view');
+            Route::get('/search/{id}', 'search')->name('history.search');
+
+        });    
+    });    
+    
+});
+
+Route::name('return.')->group(function () {
+    Route::controller(ReturnController::class)->group(function () {
+        Route::prefix('return')->group(function () {
+            Route::get('/list', 'list')->name('list');
+            Route::get('/view/{id}/{index}', 'view')->name('view');
+            Route::post('/store', 'store')->name('store');
+
+        });    
+    });    
+    
+});
+            
+
+Route::name('export.')->group(function () {
+    Route::controller(ExportController::class)->group(function () {
+        Route::prefix('export')->group(function () {
+            Route::get('/product', 'products')->name('product');
+            Route::get('/customer', 'customers')->name('customer');
+            Route::get('/inventory', 'inventory')->name('inventory');
+            Route::get('/csv/{file}', 'csv')->name('csv');
+        });    
+    });    
+    
+});
+
+Route::name('import.')->group(function () {
+    Route::controller(ImportController::class)->group(function () {
+        Route::prefix('export')->group(function () {
+            Route::post('/product', 'products')->name('product');
+            Route::post('/customer', 'customers')->name('customer');
+            Route::post('/inventory', 'inventory')->name('inventory');
+
+        });    
+    });    
+    
+});
+
+Route::name('invoice.')->group(function () {
+    Route::controller(InvoiceListController::class)->group(function () {
+        Route::prefix('invoice/list')->group(function () {
+            Route::get('/', 'list')->name('list');
+            Route::post('/', 'print')->name('print');
+            Route::get('/search', 'search')->name('search');
+            Route::get('/view/{id}', 'view')->name('view');
+            Route::get('/view/{id}/products/{index}', 'products')->name('products');
+
+        });    
+    });    
+    Route::controller(GenerateInvoiceController::class)->group(function () {
+        Route::prefix('invoice/create')->group(function () {
+            Route::get('/', 'list')->name('create.list');
+            Route::post('/', 'create')->name('create');
+            Route::get('/{id}/single_product', 'single_product')->name('create.single_product');
+        });    
+    });     
+    
+    Route::controller(InvoiceRequestController::class)->group(function () {
+        Route::prefix('invoice/request')->group(function () {
+            Route::get('/list', 'list')->name('request.list');
+            Route::get('/create', 'create')->name('request.create');
+            Route::post('/store', 'store')->name('request.store');
+            Route::get('/{id}/edit', 'edit')->name('request.edit');
+            Route::post('/{id}/update', 'update')->name('request.update');
+            Route::post('/delete/{id}', 'delete')->name('request.delete');
+            Route::post('/approve', 'approve')->name('request.approve');
+
+        });    
+    });     
+    
+});
 
 
-Route::post('/updateBeatById/{id}', [BeatController::class,'updateBeatById'])->name('updateBeatById');
-Route::post('/deleteBeatById/{id}', [BeatController::class,'deleteBeatById'])->name('deleteBeatById');
 
-Route::post('/updateCustomerById/{id}', [CustomerController::class,'updateCustomerById'])->name('updateCustomerById');
-Route::post('/deleteCustomerById/{id}', [CustomerController::class,'deleteCustomerById'])->name('deleteCustomerById');
-
-Route::post('/updateProductById/{id}', [ProductController::class,'updateProductById'])->name('updateProductById');
-Route::post('/deleteProductById/{id}', [ProductController::class,'deleteProductById'])->name('deleteProductById');
-
-Route::post('/createMeasurement', [DistributorController::class,'createMeasurement'])->name('createMeasurement');
-Route::post('/updateMeasurementById/{id}', [DistributorController::class,'updateMeasurementById'])->name('updateMeasurementById');
-Route::post('/deleteMeasurementById/{id}', [DistributorController::class,'deleteMeasurementById'])->name('deleteMeasurementById');
-
-
-Route::get('/searchCustomer',[CustomerController::class,'searchCustomer'])->name('customer.search');
-
-Route::get('/inventoryHistory',[InventoryController::class,'inventoryHistory'])->name('inventoryHistory');
-Route::get('/inventoryHistoryWithPaginate',[InventoryController::class,'inventoryHistoryWithPaginate'])->name('inventoryHistoryWithPaginate');
-
-
-Route::post('/shipment/create',[ShipmentController::class, 'createShipment'])->name('createShipment');
-Route::get('/shipment/list',[ShipmentController::class, 'shipmentList'])->name('shipmentList');
-
-Route::get('/payments/list',[PaymentController::class, 'paymentsList'])->name('paymentsList');
-Route::post('/paymentsUpdate/{id}',[PaymentController::class, 'paymentsUpdate'])->name('paymentsUpdate');
-
-Route::post('/uploadCustomerCsv',[BulkUploadController::class,'uploadCustomerCsv'])->name('customer.upload');
-Route::post('/uploadProductCsv',[BulkUploadController::class,'uploadProductCsv'])->name('product.upload');
-Route::post('/uploadInventoryCsv',[BulkUploadController::class,'uploadInventoryCsv'])->name('inventory.upload');
-
-Route::get('/generateProductCsv', [BulkUploadController::class, 'generateProductCsv'])->name('generate.product.csv');
-Route::get('/downloadProductCsv/{file}', [BulkUploadController::class, 'downloadProductCsv'])->name('download.product.csv');
-
-Route::get('/generateInventoryCsv', [BulkUploadController::class, 'generateInventoryCsv'])->name('generate.inventory.csv');
-
-Route::get('/generateCustomerCsv', [BulkUploadController::class, 'generateCustomerCsv'])->name('generate.customer.csv');
-Route::get('/downloadCustomerCsv/{file}',[BulkUploadController::class,'downloadCustomerCsv'])->name('download.customer.csv');
-
-Route::get('/getPaymentsByBeat/{beatId}',[PaymentController::class,'getPaymentsByBeat'])->name('getPaymentsByBeat');
-Route::get('/getPaymentsByInvoiceId/{invoiceId}',[PaymentController::class,'getPaymentsByInvoiceId'])->name('getPaymentsByInvoiceId');
-
-Route::get('/return/form',[ReturnController::class,'showReturnForm'])->name('showReturnForm');
-Route::get('/getProductsByInvoice/{id}/{index}',[ReturnController::class,'getInvoiceProducts'])->name('getInvoiceProducts');
-Route::post('/submitReturn',[ReturnController::class,'submitReturn'])->name('submitReturn');
-
-
-Route::get('/payment/history',[PaymentController::class,'paymentHistory'])->name('paymentHistory');
-Route::get('/getSingleInvoicePaymentDetail/{id}',[PaymentController::class,'getSingleInvoicePaymentDetail'])->name('getSingleInvoicePaymentDetail');
-Route::get('/searchPayHistory/{id}',[PaymentController::class,'searchPayHistory'])->name('searchPayHistory');
-
-Route::get('/getHsnCodeByProduct/{id}',[ProductController::class,'getHsnCodeByProduct'])->name('getHsnCodeByProduct');
-
-
-Route::get('/invoice/generatenew',[GenerateInvoiceController::class,'index'])->name('invoiceGenerateNew');
-Route::post('/invoice/createnew',[GenerateInvoiceController::class,'create'])->name('newInvoiceCreate2');
-Route::get('/getMeasurementsByProduct/{id}',[GenerateInvoiceController::class,'getMeasurementsByProduct'])->name('getMeasurementsByProduct');
-Route::get('/loadSingleProduct/{id}',[GenerateInvoiceController::class,'loadSingleProduct'])->name('loadSingleProduct');
-Route::get('/getCustomersByBeat/{id}',[GenerateInvoiceController::class,'getCustomersByBeat'])->name('getCustomersByBeat');
-Route::get('/getMaxQtyByTypeAndProduct/{typeId}/{productId}',[GenerateInvoiceController::class,'getMaxQtyByTypeAndProduct'])->name('getMaxQtyByTypeAndProduct');
-
-Route::post('/invoice/loadpdfnew',[InvoiceListController::class,'loadPdfNew'])->name('loadPdfNew');
-Route::get('/invoice/list',[InvoiceListController::class,'list'])->name('invoiceList');
-Route::get('/searchInvoice',[InvoiceListController::class,'searchInvoice'])->name('invoice.search');
-Route::get('/invoiceView/{id}',[InvoiceListController::class,'invoiceView'])->name('invoiceView');
-Route::get('/download-zip/{file}', [InvoiceListController::class, 'downloadZip'])->name('downloadZip');

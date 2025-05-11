@@ -136,7 +136,7 @@ function uploadBulk(){
 
             // Send the file to the server using AJAX
             $.ajax({
-                url: "{{ route('inventory.upload') }}",
+                url: "{{ route('import.inventory') }}",
                 method: 'POST',
                 data: formData,
                 headers: {
@@ -162,7 +162,7 @@ function uploadBulk(){
 
     function exportInventory(){
         $.ajax({
-        url: "{{ route('generate.inventory.csv') }}", // The route to your export method
+        url: "{{ route('export.inventory') }}", // The route to your export method
         type: 'GET',
         headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(

@@ -19,7 +19,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @include('pages.inventory.history-single',['inventoryHistory'=>$inventoryHistory])
+                                @include('pages.inventory-history.single',['inventoryHistory'=>$inventoryHistory])
                             </tbody>
                         </table>
                         <!-- End Table with stripped rows -->
@@ -28,8 +28,6 @@
             </div>
         </div>
     </section>
-
-    <input type="hidden" id="inventoryHistoryWithPaginateUrl" value="{{ route('inventoryHistoryWithPaginate') }}">
 
         
       </x-layout>

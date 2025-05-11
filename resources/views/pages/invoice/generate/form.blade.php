@@ -40,13 +40,6 @@
                 </select>
                 <div class="invalid-feedback" id="invalid_customer" style="display: none"></div>
 
-                <input
-                    type="hidden"
-                    id="store_url"
-                    value="{{
-                        route('newInvoiceCreate2')
-                    }}"
-                />
             </div>
         </div>
         <div class="col-lg-12 mt-4">

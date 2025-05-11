@@ -1,7 +1,7 @@
 <script>
     function exportProducts(){
         $.ajax({
-        url: "{{ route('profitExport') }}", // The route to your export method
+        url: "{{ route('profit.export') }}", // The route to your export method
         type: 'GET',
         headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
@@ -20,7 +20,7 @@
     function paginateRecords(){
         let currentPage = $("#currentPage").val();
         let perPage = $("#perPage").val();
-        let url = '{{ route('profitList') }}';
+        let url = '{{ route('profit.list') }}';
         $.ajax({
         url: url, // The URL defined in your routes
         type: "GET",

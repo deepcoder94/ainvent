@@ -10,18 +10,12 @@ class BeatController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function list()
     {
         $beats = Beat::get();
         return view('pages.beats.list', ['currentPage' => 'beats', 'beats' => $beats]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -53,40 +47,17 @@ class BeatController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Beat $beat)
+    
+    public function view(Request $request, $id)
     {
-        //
+        $resource = Beat::findOrFail($id);
+        return response()->json([
+            'data' => $resource,
+            'message' => 'Data fetched success'
+        ]);        
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Beat $beat)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Beat $beat)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Beat $beat)
-    {
-        //
-    }
-
-    public function updateBeatById(Request $request, $id)
-    {
+    public function edit(Request $request, $id){
         try {
             $validated = $request->validate([
                 'beat_name'    => 'required|string|max:255',
@@ -114,7 +85,8 @@ class BeatController extends Controller
 
     }
 
-    public function deleteBeatById(Request $request, $id)
+
+    public function delete(Request $request, $id)
     {
         $beat = Beat::find($id);
         // If the resource doesn't exist, return an error response
@@ -133,6 +105,14 @@ class BeatController extends Controller
         // Return a success response
         return response()->json([
             'message' => 'Resource deleted successfully.',
+        ]);
+    }
+
+    public function customers(Request $request, $id)
+    {
+        $customers   = Customer::where('beat_id',$id)->get();
+        return response()->json([
+            'customers'=>$customers
         ]);
     }
 }

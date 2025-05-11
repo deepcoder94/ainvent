@@ -11,7 +11,7 @@ use Carbon\Carbon;
 class SalesController extends Controller
 {
 
-    public function salesList(Request $request){
+    public function list(Request $request){
         $currentPage = 'salesList';
 
         $payments = PaymentHistory::with('beat')  // Eager load the 'beat' relationship
@@ -37,7 +37,7 @@ class SalesController extends Controller
         return view('pages.sales.list',compact('currentPage','payments','beats'));
     }
     
-    public function searchSales(Request $request){
+    public function search(Request $request){
         $date = $request->date;
         $selectedBeat = $request->selectedBeat;
 

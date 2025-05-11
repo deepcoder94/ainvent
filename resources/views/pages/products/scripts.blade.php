@@ -8,47 +8,61 @@
         $("#productModal").modal("show");
     }
 
-    function showEditForm(product, edit_url) {
-        $("#edit_url").val("");
+    function showEditForm(id) {
+        $("#edit_id").val("");
         $("#product_form")[0].reset();
-        let productJson = JSON.parse(product);
+        let url = '{{ route("product.view", ":id") }}'.replace(':id', id);
 
-        $("#modal-title").html("Edit Product");
-        $("#edit_url").val(edit_url);
-        $("#product_name").val(productJson.product_name);
-        $("#product_rate").val(productJson.product_rate);
-        $("#product_hsn").val(productJson.product_hsn);
-        $("#gst_rate").val(productJson.gst_rate);
+        $.ajax({
+            url: url, // The URL defined in your routes
+            type: "GET",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                    "content"
+                ), // CSRF Token
+            },
+            success: function (response) {
+                $("#modal-title").html("Edit Product");
+                $("#edit_id").val(id);
+                $("#product_name").val(response.data.product_name);
+                $("#product_rate").val(response.data.product_rate);
+                $("#product_hsn").val(response.data.product_hsn);
+                $("#gst_rate").val(response.data.gst_rate);
 
-        
-        if (productJson.is_active == 1) {
-            $("#product_active").prop("checked", true);
-        } else {
-            $("#product_active").prop("checked", false);
-        }
+                
+                if (response.data.is_active == 1) {
+                    $("#product_active").prop("checked", true);
+                } else {
+                    $("#product_active").prop("checked", false);
+                }
+                
 
-        let measurements = productJson.measurements;
-        // const measurementIds = measurements.map(measurement => measurement.id).join(',');
-        measurements.some((m)=>{
-            let mid = document.getElementById("product_measurements_"+m.id);
-            if(mid){
-                mid.checked = true
+                let measurements = response.data.measurements;
+                measurements.some((m)=>{
+                    let mid = document.getElementById("product_measurements_"+m.id);
+                    if(mid){
+                        mid.checked = true
+                    }
+                });
+
+
+                $("#productModal").modal("show");
+
             }
         });
 
-        
-        // $("#product_measurements").val(measurementIds.split(',')).trigger('change');            
-
-        $("#productModal").modal("show");
     }
 
     function submitProductForm() {
         let form = $("#product_form").serializeArray();
         
-        let isEdit = $("#edit_url").val();
-        let url = $("#store_url").val();
+        let isEdit = $("#edit_id").val();
+        let url = '';
         if (isEdit.length > 0) {
-            url = $("#edit_url").val();
+            url = '{{ route("product.edit", ":id") }}'.replace(':id', isEdit);
+        }
+        else{
+            url = '{{ route("product.store") }}';        
         }
 
         let groupedValues = {};
@@ -115,8 +129,10 @@
         });
     }
 
-    function showDeleteConfirmationDialog(id, url) {
+    function showDeleteConfirmationDialog(id) {
         // Show SweetAlert confirmation dialog
+        let  url = '{{ route("product.delete", ":id") }}'.replace(':id', id);
+
         Swal.fire({
             title: "Are you sure?",
             text: "Do you want to delete this Products?",
@@ -165,7 +181,7 @@
 
             // Send the file to the server using AJAX
             $.ajax({
-                url: "{{ route('product.upload') }}",
+                url: "{{ route('import.product') }}",
                 method: 'POST',
                 data: formData,
                 headers: {
@@ -191,7 +207,7 @@
     
     function exportProducts(){
         $.ajax({
-        url: "{{ route('generate.product.csv') }}", // The route to your export method
+        url: "{{ route('export.product') }}", // The route to your export method
         type: 'GET',
         headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(

@@ -9,14 +9,14 @@
         <button
             type="button"
             class="btn btn-primary"
-            onclick="showEditForm('{{ $beat }}','{{ url('/updateBeatById/')}}/{{ $beat->id }}')"
+            onclick="showEditForm('{{ $beat->id }}')"
         >
             <i class="bi bi-pencil-square"></i>
         </button>
         <button
             type="button"
             class="btn btn-danger"
-            onclick="showDeleteConfirmationDialog('{{ $beat->id }}','{{ url('/deleteBeatById/')}}/{{ $beat->id }}')"
+            onclick="showDeleteConfirmationDialog('{{ $beat->id }}')"
         >
             <i class="bi bi-trash-fill"></i>
         </button>

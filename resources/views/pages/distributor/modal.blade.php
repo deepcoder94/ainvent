@@ -17,8 +17,7 @@
                 <label for="mea_quantity" class="form-label">Quantity</label>
                 <input type="text" class="form-control" id="mea_quantity" name="mea_quantity" required>
               </div>                
-              <input type="hidden" id="store_url" value="{{ route('createMeasurement') }}">
-              <input type="hidden" id="edit_url" value="">
+              <input type="hidden" id="edit_id" value="">
 
 
           </form><!-- Vertical Form -->               

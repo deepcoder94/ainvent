@@ -14,20 +14,12 @@ class InventoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function list()
     {
         $inventory = Inventory::with('product')->orderBy('id','desc')->get();
         $products = Product::get();
         $measurements = Measurement::get();
         return view('pages.inventory.list', ['currentPage' => 'inventory','inventory' => $inventory, 'products' => $products,'measurements' => $measurements]);        
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -112,45 +104,4 @@ class InventoryController extends Controller
     
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Inventory $inventory)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Inventory $inventory)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Inventory $inventory)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Inventory $inventory)
-    {
-        //
-    }
-
-    public function inventoryHistory(Request $request){
-        $inventoryHistory = InventoryHistory::with('product')->orderBy('id','desc')->with('measurement')->get();
-        return view('pages.inventory.history', ['currentPage' => 'inventoryHistory','inventoryHistory' => $inventoryHistory]);        
-    }
-
-    public function inventoryHistoryWithPaginate(Request $request){
-        $inventoryHistory = InventoryHistory::with('product')->orderBy('id','desc')->with('measurement')->get();
-        return view('pages.inventory.history', ['currentPage' => 'inventoryHistory','inventoryHistory' => $inventoryHistory]);        
-    }
 }

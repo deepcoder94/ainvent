@@ -13,7 +13,8 @@ function confirmRecord(customer_id){
     let invoiceid = $(`.btn_${customer_id}`).data("invoiceid");
     let customerid = $(`.btn_${customer_id}`).data("customerid");
     
-    let updateUrl = '{{ url('paymentsUpdate') }}/'+customer_id
+    let updateUrl = "{{ route('payment.edit', ['id' => '__id__']) }}"
+                .replace('__id__', customer_id);    
 
     let paid_total = $(`#paid_total_${customer_id}`).val();
     paid_total = parseFloat(paid_total)
@@ -50,7 +51,11 @@ function confirmRecord(customer_id){
 
 function getPaymentsByBeat(){
     let beatId = $("#beat_select").val();
-    let url = "{{ url('getPaymentsByBeat') }}/"+beatId;
+
+    let url = "{{ route('payment.view', ['type' => '__type__', 'id' => '__id__']) }}"
+                .replace('__type__', 'beat')
+                .replace('__id__', beatId);
+
     $.ajax({
         url: url,  // The URL defined in your routes
         type: 'GET',
@@ -72,7 +77,11 @@ function searchByInvoice(){
     if(invoiceNumber.length == 0){
             return;
     }
-    let url = "{{ url('getPaymentsByInvoiceId') }}/"+invoiceNumber;
+
+    let url = "{{ route('payment.view', ['type' => '__type__', 'id' => '__id__']) }}"
+                .replace('__type__', 'invoice')
+                .replace('__id__', invoiceNumber);
+
     $(".no-record-inv-search-loader").css('display','contents');
     $(".no-record-inv-search").css('display','none');
     $.ajax({
@@ -140,7 +149,8 @@ function confirmInvRecord(){
     let invoiceid = $(`#cnfBtn`).data("invoiceid");
     let paid_total = parseFloat($("#paid_total").val());
 
-    let updateUrl = '{{ url('paymentsUpdate') }}/'+customerid  
+    let  updateUrl = '{{ route("payment.edit", ":id") }}'.replace(':id', customerid);
+
     $(".status_progress").removeClass('visually-hidden');
     $(".status_pay").addClass('visually-hidden');
 

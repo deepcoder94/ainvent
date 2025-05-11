@@ -11,7 +11,7 @@
                                         <button
                                             type="button"
                                             class="btn btn-primary"
-                                            onclick="showEditForm('{{ $customer }}','{{ url('/updateCustomerById/')}}/{{ $customer->id }}')"
+                                            onclick="showEditForm('{{ $customer->id }}')"
                                             
                                         >
                                             <i class="bi bi-pencil-square"></i>
@@ -19,7 +19,7 @@
                                         <button
                                             type="button"
                                             class="btn btn-danger"
-                                            onclick="showDeleteConfirmationDialog('{{ $customer->id }}','{{ url('/deleteCustomerById/')}}/{{ $customer->id }}')"                                            
+                                            onclick="showDeleteConfirmationDialog('{{ $customer->id }}')"                                            
                                         >
                                             <i class="bi bi-trash-fill"></i>
                                         </button>

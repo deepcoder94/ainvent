@@ -12,20 +12,13 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function list()
     {
         $products = Product::with('measurements')->get();
         $measurements = Measurement::all();
         return view('pages.products.list', ['currentPage' => 'products', 'products' => $products,'measurements' => $measurements]);        
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -71,39 +64,16 @@ class ProductController extends Controller
         ]);        
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Product $product)
-    {
-        //
-    }
+    public function view(Request $request,$id){
+        $resource = Product::where('id',$id)->with('measurements')->get()->first();
+        return response()->json([
+            'data' => $resource,
+            'message' => 'Data fetched',
+        ]);                
+    }    
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Product $product)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Product $product)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Product $product)
-    {
-        //
-    }
-
-    public function updateProductById(Request $request,$id){
+    public function edit(Request $request,$id){
         try {
             $validated = $request->validate([
                 'product_name'    => 'required|string|max:255',
@@ -143,7 +113,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function deleteProductById(Request $request, $id)
+    public function delete(Request $request, $id)
     {
         $beat = Product::find($id);
         // If the resource doesn't exist, return an error response
@@ -160,11 +130,35 @@ class ProductController extends Controller
         ]);
     }    
 
-    public function getHsnCodeByProduct(Request $request,$id){
-        $product = Product::where('product_name',$id)->get()->first();
+    public function measurements(Request $request, $id)
+    {
+        $products    = Product::with('measurements')->with('inventory')->where('id',$id)->get()->first();
+
         return response()->json([
-            'data'=>$product,
-            'message' => 'Resource fetched successfully.',
+            'data'=>$products->measurements
         ]);        
+    }    
+
+    public function max_qty(Request $request, $id,$typeId)
+    {
+        $products    = Product::with('measurements')->with('inventory')->where('id',$id)->get()->first();        
+
+        $total_stock = $products->inventory->total_stock;
+        $buying_price = $products->inventory->buying_price; // Min rate
+
+        $measurement = $products->measurements;
+        $qty = collect($measurement)->filter(function($value) use ($typeId){
+            return $value->id == $typeId;
+        })->first()->quantity;
+
+        return response()->json(
+            [
+                'max_qty'=>($total_stock/$qty),2,
+                'min_rate'=>$buying_price
+            ]
+        );
+        
     }
+    
+    
 }

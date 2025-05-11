@@ -108,12 +108,7 @@
                                 >
                             </div>
                         </div>
-                        <input
-                            type="hidden"
-                            id="store_url"
-                            value="{{ route('products.store') }}"
-                        />
-                        <input type="hidden" id="edit_url" value="" />
+                        <input type="hidden" id="edit_id" value="" />
                     </form>
                 </div>
                 <div class="modal-footer">

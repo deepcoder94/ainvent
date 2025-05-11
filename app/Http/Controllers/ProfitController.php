@@ -12,7 +12,7 @@ use Carbon\Carbon;
 class ProfitController extends Controller
 {
     
-    public function profitList(Request $request){
+    public function list(Request $request){
         
         $perPage = 10;        
         $currentPageNum = 1;
@@ -22,8 +22,9 @@ class ProfitController extends Controller
             // For each invoice group, calculate the total profit
             $profit = 0;
             foreach($invoiceItems as $i){
-                $profit += ($i['mrp'] - $i['buying_price']) * $i['quantity'] * $i['measurement']['quantity'];
+                $profit += (($i['mrp'] ?? 0) - ($i['buying_price'] ?? 0)) * ($i['quantity'] ?? 0) * ($i['measurement']['quantity'] ?? 0);
             }
+
             // $invoice = $invoiceItems->first(); // Get the first item to retrieve invoice details (like created_at)
             // $totalProfit = $invoiceItems->sum(function ($item) {                
             //     // $sp = $this->calculateSp($item['rate'],$item['product']['gst_rate']);
@@ -80,25 +81,31 @@ class ProfitController extends Controller
         return ceil($number * $factor) / $factor;
     }    
     
-    public function profitExport(){
+    public function export(){
         
 
         $prods2 = InvoiceProduct::with('invoice')->with('measurement')->with('product')->orderBy('created_at', 'desc')->get()->toArray();
         $groupedData2 = collect($prods2)->groupBy('invoice_id')->map(function ($invoiceItems) {
             // For each invoice group, calculate the total profit
-            $invoice = $invoiceItems->first(); // Get the first item to retrieve invoice details (like created_at)
-            $totalProfit = $invoiceItems->sum(function ($item) {
-                return (($item['buying_price'] - $item['mrp']) * $item['quantity']) * $item['measurement']['quantity'];
 
-                // $sp = $this->calculateSp($item['rate'],$item['product']['gst_rate']);
-                // return (($sp - $item['buying_price']) * $item['quantity']) * $item['measurement']['quantity'];                
-            });
+            $profit = 0;
+            foreach($invoiceItems as $i){
+                $profit += ($i['mrp'] - $i['buying_price']) * $i['quantity'] * $i['measurement']['quantity'];
+            }
+
+            // $invoice = $invoiceItems->first(); // Get the first item to retrieve invoice details (like created_at)
+            // $totalProfit = $invoiceItems->sum(function ($item) {
+            //     return (($item['buying_price'] - $item['mrp']) * $item['quantity']) * $item['measurement']['quantity'];
+
+            //     // $sp = $this->calculateSp($item['rate'],$item['product']['gst_rate']);
+            //     // return (($sp - $item['buying_price']) * $item['quantity']) * $item['measurement']['quantity'];                
+            // });
         
             return [
-                'created_at' => \Carbon\Carbon::parse($invoice['created_at'])->timezone('Asia/Kolkata')->format('d-m-Y'), // You can take created_at from any item in the group
-                'gst_invoice_id' => $invoice['invoice_id'],
-                'total_profit' => $totalProfit,
-                'invoice_number' => $invoice['invoice']['invoice_number'], // Invoice number
+                'created_at' => \Carbon\Carbon::parse($invoiceItems[0]['created_at'])->timezone('Asia/Kolkata')->format('d-m-Y'), // You can take created_at from any item in the group
+                'gst_invoice_id' => $invoiceItems[0]['invoice_id'],
+                'total_profit' => $profit,
+                'invoice_number' => $invoiceItems[0]['invoice']['invoice_number'], // Invoice number
             ];
         });        
         

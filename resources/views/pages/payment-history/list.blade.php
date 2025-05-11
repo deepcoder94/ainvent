@@ -43,8 +43,8 @@
 
     <script>
         function viewSingleInvoicePayment(invid){
+            let  url = '{{ route("payment.history.view", ":id") }}'.replace(':id', invid);
 
-            let url = "{{ url('getSingleInvoicePaymentDetail') }}/"+invid;
 
             $.ajax({
             url: url,  // The URL defined in your routes
@@ -70,7 +70,8 @@
                 searchId = 'all';
             }
 
-            let url ="{{ url('searchPayHistory') }}/"+searchId;
+            let  url = '{{ route("payment.history.search", ":id") }}'.replace(':id', searchId);
+
             $.ajax({
                 url: url,  // The URL defined in your routes
                 type: 'GET',

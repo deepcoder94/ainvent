@@ -5,8 +5,13 @@
     function getProducts(ev){
         recordIndex=1;
         let invoiceId = $("#invoiceId").val();
-        let url = '{{ url('getProductsByInvoice') }}/'+invoiceId+'/'+recordIndex;
-        let viewUrl = '{{ url('invoiceView') }}/'+invoiceId
+        let url = "{{ route('return.view', ['id' => '__id__', 'index' => '__index__']) }}"
+                .replace('__id__', invoiceId)
+                .replace('__index__', recordIndex);
+
+
+        let  viewUrl = '{{ route("invoice.view", ":id") }}'.replace(':id', invoiceId);
+
         let options = [];
         $.ajax({
                 url: url,  // The URL defined in your routes
@@ -42,7 +47,11 @@
     function appendReturnProduct(){
         recordIndex++;
         let invoiceId = $("#invoiceId").val();
-        let url = '{{ url('getProductsByInvoice') }}/'+invoiceId+'/'+recordIndex;
+
+        let url = "{{ route('invoice.products', ['id' => '__id__', 'index' => '__index__']) }}"
+                .replace('__id__', invoiceId)
+                .replace('__index__', recordIndex);
+
         let options = [];
         $.ajax({
                 url: url,  // The URL defined in your routes
@@ -99,7 +108,7 @@
             alert('Invalid inputs. please check once');
             return;
         }
-        let url ='{{ url('/submitReturn') }}';
+        let url = '{{ route("return.store") }}';        
         $.ajax({
                 url: url,  // The URL defined in your routes
                 type: 'POST',

@@ -18,12 +18,7 @@
         <button
             type="button"
             class="btn btn-primary btn-sm me-2"
-            onclick="showEditForm('{{
-                $product
-            }}','{{
-                url('/updateProductById/')
-            }}/{{ $product->id }}')"
-        >
+            onclick="showEditForm('{{ $product->id }}')">
             <i
                 class="bi bi-pencil-square"
             ></i>
@@ -33,9 +28,7 @@
         <button
             type="button"
             class="btn btn-danger btn-sm"
-            onclick="showDeleteConfirmationDialog('{{ $product->id }}','{{
-                url('/deleteProductById/')
-            }}/{{ $product->id }}')"
+            onclick="showDeleteConfirmationDialog('{{ $product->id }}')"
         >
             <i class="bi bi-trash-fill"></i>
         </button>

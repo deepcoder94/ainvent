@@ -1,15 +1,27 @@
 
 <script>
-    function showEditForm(measurement, edit_url) {
-        $("#edit_url").val("");
+    function showEditForm(id) {
         $("#mea_form")[0].reset();
-        let measurementJson = JSON.parse(measurement);
 
-        $("#modal-title").html("Edit Measurement");
-        $("#edit_url").val(edit_url);
-        $("#mea_name").val(measurementJson.name);
-        $("#mea_quantity").val(measurementJson.quantity);
-        $("#meaModal").modal("show");
+        $.ajax({
+            url: '{{ route("measurement.view", ":id") }}'.replace(':id', id),
+            type: "GET",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                    "content"
+                ), // CSRF Token
+            },
+            success: function (response) {
+
+                $("#modal-title").html("Edit Measurement");
+                $("#mea_name").val(response.data.name);
+                $("#mea_quantity").val(response.data.quantity);
+                $("#edit_id").val(id);
+                $("#meaModal").modal("show");
+                
+            }
+        });
+
     }
 
     function showCreateForm() {
@@ -23,10 +35,11 @@
     function submitMeasurementForm() {
         let form = $("#mea_form").serializeArray();
 
-        let isEdit = $("#edit_url").val();
-        let url = $("#store_url").val();
+        let isEdit = $("#edit_id").val();
+        let url = '{{ route('measurement.create') }}';
         if (isEdit.length > 0) {
-            url = $("#edit_url").val();
+            let id = $("#edit_id").val();
+            url = '{{ route("measurement.update", ":id") }}'.replace(':id', id);
         }
 
         let data = {
@@ -58,7 +71,7 @@
             },
         });
     }
-    function showDeleteConfirmationDialog(id, url) {
+    function showDeleteConfirmationDialog(id) {
         // Show SweetAlert confirmation dialog
         Swal.fire({
             title: "Are you sure?",
@@ -71,7 +84,7 @@
             if (result.isConfirmed) {
                 // If confirmed, proceed with AJAX request to delete the resource
                 $.ajax({
-                    url: url, // Your route to delete the resource
+                    url: '{{ route("measurement.delete", ":id") }}'.replace(':id', id),
                     type: "POST",
                     data: {
                         _token: "{{ csrf_token() }}", // CSRF token for security

@@ -3,7 +3,7 @@
       <h5 class="card-title">Distributor details</h5>
 
       <!-- General Form Elements -->
-      <form class="row g-3" action="{{ route('updateCompany') }}" method="POST" enctype="multipart/form-data">
+      <form class="row g-3" action="{{ route('distributor.update') }}" method="POST" enctype="multipart/form-data">
           @csrf
         <div class="col-12">
           <label for="inputText" class="form-label">Name</label>
