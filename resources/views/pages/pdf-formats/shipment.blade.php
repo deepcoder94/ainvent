@@ -107,8 +107,8 @@
                     <td>{{ $item['case_count'] }}</td>
                     <td>{{ $item['piece_count'] }}</td>
                     <td>{{ $item['qty_count'] }}</td>
-                    <td>{{ $item['product_gst'] }}</td>
-                    <td>{{ $item['product_total_amount'] }}</td>
+                    <td>{{ round($item['product_gst']) }}</td>
+                    <td>{{ round($item['product_total_amount']) }}</td>
                 </tr>
             @endforeach
             <tr class="total-row">
@@ -118,8 +118,8 @@
                 <td>{{ $shipmentCaseTotal }}</td>
                 <td>{{ $shipmentPcTotal }}</td>
                 <td>{{ $shipmentQtyTotal }}</td>
-                <td>{{ $gstTotal }}</td>
-                <td>{{ $shipmentTotal }}</td>
+                <td>{{ round($gstTotal) }}</td>
+                <td>{{ round($shipmentTotal) }}</td>
             </tr>            
         </tbody>
     </table>

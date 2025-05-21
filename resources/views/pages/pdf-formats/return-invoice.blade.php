@@ -128,13 +128,13 @@
                     <td>{{ $item['qty'] }}</td>
                     <td>{{ $item['type'] }}</td>
                     <td>{{ $item['product_description'] }}</td>
-                    <td>{{ number_format($item['rate'], 2) }}</td>
-                    <td>{{ number_format($item['amount'], 2) }}</td>
+                    <td>{{ round($item['rate']) }}</td>
+                    <td>{{ round($item['amount']) }}</td>
                 </tr>
             @endforeach
             <tr>
                 <td colspan="4" style="text-align: right; font-weight: bold;">Total</td>
-                <td>{{ number_format($i['total'], 2) }}</td>
+                <td>{{ round($i['total']) }}</td>
             </tr>            
         </tbody>
     </table>    
