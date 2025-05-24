@@ -77,9 +77,9 @@
                 <td>{{ $item['rate'] }}</td>
                 <td class="bold">{{ $item['box'] }}</td>
                 <td class="bold">{{ $item['pcs'] }}</td>
-                <td>{{ $item['gst_rate'] }}</td>
-                <td>{{ $item['gst_amt'] }}</td>
-                <td>{{ $item['net_amt'] }}</td>
+                <td>{{ round($item['gst_rate']) }}</td>
+                <td>{{ round($item['gst_amt']) }}</td>
+                <td>{{ round($item['net_amt']) }}</td>
             </tr>
             @endforeach
             <!-- Total Row -->
@@ -88,8 +88,8 @@
                 <td class="bold">{{ $i['boxtotal'] }}</td> <!-- Total Box -->
                 <td class="bold">{{ $i['pcstotal'] }}</td> <!-- Total Pcs -->
                 <td></td> <!-- GST% -->
-                <td>{{ $i['totalgst'] }}</td> <!-- GST -->
-                <td>{{ $i['totalnetamt'] }}</td> <!-- Total Net Amt -->
+                <td>{{ round($i['totalgst']) }}</td> <!-- GST -->
+                <td>{{ round($i['totalnetamt']) }}</td> <!-- Total Net Amt -->
             </tr>
         </tbody>
     </table>
@@ -109,9 +109,9 @@
         </thead>
         <tbody>
             <tr>
-                <td>{{ $i['taxableamt'] }}</td>
-                <td>{{ $i['totalgst'] / 2 }}</td>
-                <td>{{ $i['totalgst'] / 2 }}</td>
+                <td>{{ round($i['taxableamt']) }}</td>
+                <td>{{ round($i['totalgst'] / 2) }}</td>
+                <td>{{ round($i['totalgst'] / 2) }}</td>
                 <td>0.00</td>
                 <td>0.00</td>
                 <td>0.00</td>

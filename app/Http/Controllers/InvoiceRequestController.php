@@ -132,11 +132,21 @@ class InvoiceRequestController extends Controller
         $measurement = $products->measurements;
         $qty = collect($measurement)->filter(function($value) use ($typeId){
             return $value->id == $typeId;
-        })->first()->quantity;
+        })->first();
+        
+        $maxqty = 0;        
+        if(!empty($qty)){
+            $q = $qty->quantity;
+            $maxqty = $total_stock / $q;
+        }
+        else{
+            $q = 0;
+            $maxqty=0;
+        }
 
         return 
             [
-                'max_qty'=>($total_stock/$qty),
+                'max_qty'=>$maxqty,
                 'min_rate'=>$buying_price
             ];
         
