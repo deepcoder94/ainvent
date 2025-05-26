@@ -31,7 +31,8 @@ class InvoiceRequestController extends Controller
         ->get();
         if(count($pages)>0){
             $firstPage = $pages[0]['date'];
-            $invoices = InvoiceRequest::with('customer')->with('beat')->whereDate('created_at',$firstPage)->orderBy('id','desc')->get();            
+            $invoices = InvoiceRequest::with('customer')->with('beat')->with('products')->whereDate('created_at',$firstPage)->orderBy('id','desc')->get();            
+            // dd($invoices);
         }
         else{
             $invoices=[];
@@ -232,6 +233,120 @@ class InvoiceRequestController extends Controller
                 'success' => $success,
                 'message' => $message,
             ]);            
+
+    }
+
+    public function preview(Request $request){
+        $invoiceRequests = $request->input('selectedInvoices');
+        foreach($invoiceRequests as $request){
+            $finalReqData = [];
+            $req = InvoiceRequest::where('id',$request)->with('products')->get()->first();
+            $finalReqData['beat_id'] = $req->beat_id;
+            $finalReqData['customer_id'] = $req->customer_id;
+
+            $products = [];
+
+            foreach($req->products as $p){
+                $invRecord = Inventory::where('product_id',$p->product_id)->get()->first();
+                $min_rate = $invRecord->buying_price;
+                $prod = [
+                    'product_id'=>$p->product_id,
+                    'measurement_id'=>$p->measurement_id,
+                    'qty'=>$p->quantity,
+                    'rate'=>$p->rate,
+                    'minrate'=>$min_rate
+                ];
+                array_push($products,$prod);
+            }
+            $finalReqData['products'] = $products;
+            $this->createRequestInvoice(array_merge($finalReqData,['req_id'=>$request]));
+            dd($finalReqData);
+
+            // $this->createInvoice($finalReqData);
+
+            // $req->products()->delete();
+            // $req->delete();
+            }
+            // $success = true;
+            // $message = 'Invoice saved successfully';
+            // return response()->json([
+            //     'success' => $success,
+            //     'message' => $message,
+            // ]);            
+
+    }    
+
+    public function createRequestInvoice($requestData){
+        try{
+            $total = 0;
+
+            $profit = 0;
+            $taxableamt=0;
+            $totalgst=0;
+            foreach ($requestData['products'] as $product) {
+
+                $measurement = Measurement::where('id',$product['measurement_id'])->get()->first();
+
+                // Profit = SP-CP * qty
+                $sp = $product['rate'];
+                $cp = $product['minrate'];
+                $pqty = $product['qty'];
+                $profit += ($sp-$cp)*$pqty;
+
+                $pd = Product::where('id',$product['product_id'])->get()->first();
+                $actualRate = $this->roundUp(($sp * 100) / (100+$pd->gst_rate));
+                $inventory = Inventory::where('product_id', $product['product_id'])->get()->first();
+
+                $data = [
+                    'invoice_id' => $requestData['req_id'],
+                    'product_id' => $product['product_id'],
+                    'measurement_id' => $product['measurement_id'],
+                    'quantity' => $product['qty'],
+                    'mrp'=>$product['rate'],
+                    'gst'=>($pd->gst_rate/100)*($actualRate * $measurement->quantity * $product['qty']),
+                    'rate' => $actualRate,
+                    'buying_price'=>$cp,
+                    'gst_rate'=>$pd->gst_rate
+                ];
+
+                dd($data);
+
+                
+                $totalDeduction = $measurement->quantity * $product['qty'];
+
+
+                $taxableamt += $actualRate * $totalDeduction;
+                $totalgst += ($pd->gst_rate/100)*($actualRate * $totalDeduction);
+
+
+                // $inventory->total_stock -= $totalDeduction;
+                // $inventory->save();
+
+                // InventoryHistory::create([
+                //     'product_id' => $product['product_id'],
+                //     'measurement_id' => $product['measurement_id'],
+                //     'stock_out_in'   => $totalDeduction,
+                //     'stock_action'  => 'deduct'
+                // ]);
+
+            }
+            $total = round($taxableamt + $totalgst,0);
+                // CustomerPayment::create([
+                //     'customer_id'=>$requestData['customer_id'],
+                //     'invoice_total'=>$total,
+                //     'total_due'=>$total,
+                //     'invoice_id'=>$newInvoice->id
+                // ]);
+
+                // $newInvoice->invoice_total = $total;
+                // $newInvoice->invoice_amount = $total;
+                // $newInvoice->save();
+
+        } 
+         catch (\Exception $e) {
+            $success = false;
+            $message = $e->getMessage();
+        }
 
     }
 

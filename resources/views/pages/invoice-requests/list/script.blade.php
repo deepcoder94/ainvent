@@ -104,5 +104,36 @@
             }
         });
         
-    }    
+    }  
+    
+    function previewRequests(){
+        let selectedInvoices = [];
+        $(".invoice-check:checked").each(function () {
+            selectedInvoices.push($(this).data("id"));
+        });
+        if (selectedInvoices.length > 0) {
+            $.ajax({
+                url: "{{ route('invoice.request.preview') }}", // The URL defined in your routes
+                type: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ), // CSRF Token
+                },
+                dataType: "json",
+                data: { selectedInvoices: selectedInvoices },
+                success: function (response) {
+                    alert('Requests Approved Successfully');
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    alert(error);
+                },
+            });
+        } else {
+            alert("Please select at least one invoice to print.");
+            return; // Exit the function if no invoices are selected.
+        }
+
+    }
 </script>

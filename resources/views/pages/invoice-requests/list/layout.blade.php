@@ -1,9 +1,12 @@
 <x-layout :currentPage="$currentPage">
     <div class="row">
-        <div class="col-lg-3">
+        <div class="col-lg-12 d-flex">
             <button class="btn btn-primary mt-2 mb-2" onclick="approveRequests()">
                 Approve Requests
             </button>    
+            <button class="btn btn-primary mt-2 mb-2" style="margin-left: 10px" onclick="previewRequests()">
+                Preview Requests
+            </button>                
         </div>
     </div>
     <div>
@@ -29,10 +32,11 @@
                                             />
                                         </div>
                                     </th>
-                                    <th>Request ID</th>
+                                    <th>Req. ID</th>
                                     <th>Customer Name</th>
                                     <th>Beat Name</th>
                                     <th>Date</th>
+                                    <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>

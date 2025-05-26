@@ -221,6 +221,7 @@ Route::name('invoice.')->group(function () {
             Route::post('/{id}/update', 'update')->name('request.update');
             Route::post('/delete/{id}', 'delete')->name('request.delete');
             Route::post('/approve', 'approve')->name('request.approve');
+            Route::post('/preview', 'preview')->name('request.preview');
 
         });    
     });     
