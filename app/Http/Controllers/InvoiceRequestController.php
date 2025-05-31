@@ -226,8 +226,8 @@ class InvoiceRequestController extends Controller
 
             $this->createInvoice($finalReqData);
 
-            // $req->products()->delete();
-            // $req->delete();
+            $req->products()->delete();
+            $req->delete();
             }
             $success = true;
             $message = 'Invoice saved successfully';
