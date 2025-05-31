@@ -32,7 +32,7 @@
               <span>Invoice Requests</span>
             </a>
           </li><!-- End F.A.Q Page Nav -->          
-          <li class="nav-item">
+          <li class="nav-item d-none">
             <a class="nav-link {{ $currentPage=='invoiceGenerateNew'?'':'collapsed' }}" href="{{ route('invoice.create.list') }}">
               <i class="bi bi-clipboard-plus"></i>
               <span>Generate Invoice</span>
