@@ -27,7 +27,7 @@
 </tr>
 @empty
 <tr>
-    <td colspan="5" class="text-center">
+    <td colspan="8" class="text-center">
         No records
     </td>
 </tr>
