@@ -226,8 +226,8 @@ class InvoiceRequestController extends Controller
 
             $this->createInvoice($finalReqData);
 
-            $req->products()->delete();
-            $req->delete();
+            // $req->products()->delete();
+            // $req->delete();
             }
             $success = true;
             $message = 'Invoice saved successfully';
@@ -352,6 +352,7 @@ class InvoiceRequestController extends Controller
                     'type' => $meas->name,
                     'product_description' => $pd->product_name,
                     'rate' => $actualRate,
+                    'entry_rate'=>$sp,
                     'amount' => $data['quantity'] * $actualRate * $meas->quantity,
                     'product_hsn'=>$pd->product_hsn,
                     'box'=>$meas->name!='Piece'?$data['quantity']:0,

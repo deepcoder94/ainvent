@@ -58,6 +58,7 @@
                 <th>Sr.</th>
                 <th>HSN</th>
                 <th>Description</th>
+                <th>Entry Rate</th>
                 <th>Rate</th>
                 <th>Case</th>
                 <th>Pcs</th>
@@ -71,6 +72,7 @@
                 <td>{{ ++$in }}</td>
                 <td>{{ $item['product_hsn'] }}</td>
                 <td>{{ $item['product_description'] }}</td>
+                <td>{{ $item['entry_rate'] }}</td>
                 <td>{{ $item['rate'] }}</td>
                 <td class="bold">{{ $item['box'] }}</td>
                 <td class="bold">{{ $item['pcs'] }}</td>
@@ -79,7 +81,7 @@
             @endforeach
             <!-- Total Row -->
             <tr class="bold">
-                <td colspan="4" class="center">Total</td>
+                <td colspan="5" class="center">Total</td>
                 <td class="bold">{{ $i['boxtotal'] }}</td> <!-- Total Box -->
                 <td class="bold">{{ $i['pcstotal'] }}</td> <!-- Total Pcs -->
                 <td>{{ round($i['grandTotal']) }}</td> <!-- Total Net Amt -->
