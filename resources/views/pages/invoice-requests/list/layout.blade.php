@@ -32,11 +32,12 @@
                                             />
                                         </div>
                                     </th>
-                                    <th>Req. ID</th>
-                                    <th>Customer Name</th>
-                                    <th>Beat Name</th>
+                                    <th>ID</th>
+                                    <th>Customer</th>
+                                    <th>Beat</th>
                                     <th>Date</th>
-                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th>GST</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>

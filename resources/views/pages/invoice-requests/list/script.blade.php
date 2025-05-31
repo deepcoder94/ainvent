@@ -123,8 +123,7 @@
                 dataType: "json",
                 data: { selectedInvoices: selectedInvoices },
                 success: function (response) {
-                    alert('Requests Approved Successfully');
-                    location.reload();
+                    window.location.href = response.zipUrl;                    
                 },
                 error: function (xhr, status, error) {
                     alert(error);

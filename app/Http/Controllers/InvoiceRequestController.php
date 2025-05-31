@@ -18,6 +18,9 @@ use App\Models\InvoiceRequestProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\CustomerPayment;
+use Barryvdh\DomPDF\Facade\Pdf;
+use ZipArchive;
+use App\Models\Distributor;
 
 class InvoiceRequestController extends Controller
 {
@@ -32,7 +35,6 @@ class InvoiceRequestController extends Controller
         if(count($pages)>0){
             $firstPage = $pages[0]['date'];
             $invoices = InvoiceRequest::with('customer')->with('beat')->with('products')->whereDate('created_at',$firstPage)->orderBy('id','desc')->get();            
-            // dd($invoices);
         }
         else{
             $invoices=[];
@@ -238,6 +240,18 @@ class InvoiceRequestController extends Controller
 
     public function preview(Request $request){
         $invoiceRequests = $request->input('selectedInvoices');
+        $time = time();
+        $invoiceData = [];
+        // Create a new ZIP file in storage
+        $zipFileName = 'request_preview'.$time.'.zip';
+        $zipFilePath = storage_path('app/' . $zipFileName);
+        $zip = new ZipArchive();
+
+        // Open the zip file for writing
+        if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
+            return response()->json(['error' => 'Failed to create zip file'], 500);
+        }
+
         foreach($invoiceRequests as $request){
             $finalReqData = [];
             $req = InvoiceRequest::where('id',$request)->with('products')->get()->first();
@@ -259,20 +273,27 @@ class InvoiceRequestController extends Controller
                 array_push($products,$prod);
             }
             $finalReqData['products'] = $products;
-            $this->createRequestInvoice(array_merge($finalReqData,['req_id'=>$request]));
-            dd($finalReqData);
+            $invoiceData[] = $this->createRequestInvoice(array_merge($finalReqData,['req_id'=>$request]));
 
-            // $this->createInvoice($finalReqData);
-
-            // $req->products()->delete();
-            // $req->delete();
             }
-            // $success = true;
-            // $message = 'Invoice saved successfully';
-            // return response()->json([
-            //     'success' => $success,
-            //     'message' => $message,
-            // ]);            
+        $invoicesArray = ['invoices'=>$invoiceData];
+        
+
+            // Generate the PDF for the current invoice
+            $pdf = PDF::loadView('pages.pdf-formats.request-preview', $invoicesArray);
+            $pdf->setPaper('A4');
+            $pdfContent = $pdf->output();
+
+            // Add the PDF to the zip with a unique filename (e.g., invoice number)
+            $zip->addFromString('request_preview_'.$time.'.pdf', $pdfContent);
+
+
+        // Close the zip file
+        $zip->close();
+        // Prepare the zip file for download
+        return response()->json([
+            'zipUrl' => route('export.csv', ['file' => $zipFileName])
+        ]);
 
     }    
 
@@ -283,6 +304,15 @@ class InvoiceRequestController extends Controller
             $profit = 0;
             $taxableamt=0;
             $totalgst=0;
+
+            $items = [];
+            $boxtotal = 0;
+            $pcstotal = 0;
+            $totalnetamt = 0;
+            $totalgst = 0;
+            $taxableamt = 0;
+
+
             foreach ($requestData['products'] as $product) {
 
                 $measurement = Measurement::where('id',$product['measurement_id'])->get()->first();
@@ -291,11 +321,12 @@ class InvoiceRequestController extends Controller
                 $sp = $product['rate'];
                 $cp = $product['minrate'];
                 $pqty = $product['qty'];
-                $profit += ($sp-$cp)*$pqty;
 
                 $pd = Product::where('id',$product['product_id'])->get()->first();
                 $actualRate = $this->roundUp(($sp * 100) / (100+$pd->gst_rate));
                 $inventory = Inventory::where('product_id', $product['product_id'])->get()->first();
+
+                $meas = Measurement::where('id',$product['measurement_id'])->get()->first();
 
                 $data = [
                     'invoice_id' => $requestData['req_id'],
@@ -303,46 +334,79 @@ class InvoiceRequestController extends Controller
                     'measurement_id' => $product['measurement_id'],
                     'quantity' => $product['qty'],
                     'mrp'=>$product['rate'],
-                    'gst'=>($pd->gst_rate/100)*($actualRate * $measurement->quantity * $product['qty']),
                     'rate' => $actualRate,
                     'buying_price'=>$cp,
-                    'gst_rate'=>$pd->gst_rate
                 ];
 
-                dd($data);
 
                 
                 $totalDeduction = $measurement->quantity * $product['qty'];
 
 
                 $taxableamt += $actualRate * $totalDeduction;
-                $totalgst += ($pd->gst_rate/100)*($actualRate * $totalDeduction);
 
 
-                // $inventory->total_stock -= $totalDeduction;
-                // $inventory->save();
+                $actualRate = $this->roundUp(($data['mrp'] * 100) / (100+$pd->gst_rate));
+                $item = [
+                    'qty' => $data['quantity'],
+                    'type' => $meas->name,
+                    'product_description' => $pd->product_name,
+                    'rate' => $actualRate,
+                    'amount' => $data['quantity'] * $actualRate * $meas->quantity,
+                    'product_hsn'=>$pd->product_hsn,
+                    'box'=>$meas->name!='Piece'?$data['quantity']:0,
+                    'pcs'=>$meas->name=='Piece'?$data['quantity']:0,
+                    'net_amt'=>(($pd->gst_rate/100)*($actualRate * $meas->quantity * $data['quantity']))+ ($actualRate * $pd->quantity * $data['quantity'])
+                ];
+                $boxtotal += $meas->name!='Piece'?$data['quantity']:0;
+                $pcstotal += $meas->name=='Piece'?$data['quantity']:0;
+                $taxableamt += $actualRate * $meas->quantity * $data['quantity'];
+                
+                $totalnetamt += (($pd->gst_rate/100)*($actualRate * $meas->quantity * $data['quantity']))+ ($actualRate * $meas->quantity * $data['quantity']);
+                array_push($items, $item);
+            
 
-                // InventoryHistory::create([
-                //     'product_id' => $product['product_id'],
-                //     'measurement_id' => $product['measurement_id'],
-                //     'stock_out_in'   => $totalDeduction,
-                //     'stock_action'  => 'deduct'
-                // ]);
 
-            }
-            $total = round($taxableamt + $totalgst,0);
-                // CustomerPayment::create([
-                //     'customer_id'=>$requestData['customer_id'],
-                //     'invoice_total'=>$total,
-                //     'total_due'=>$total,
-                //     'invoice_id'=>$newInvoice->id
-                // ]);
 
-                // $newInvoice->invoice_total = $total;
-                // $newInvoice->invoice_amount = $total;
-                // $newInvoice->save();
+            $total = collect($items)->sum('amount');
+            $grandTotal = $total;
 
-        } 
+            $customer = Customer::where('id',$requestData['customer_id'])->get()->first();
+            $customer_name = $customer->customer_name;
+
+            $beat = Beat::where('id',$requestData['beat_id'])->get()->first();
+            $beat_name = $beat->beat_name;
+
+            $request_id = $requestData['req_id'];
+            // $date = \Carbon\Carbon::parse($invoice->created_at)->timezone('Asia/Kolkata')->format('d-m-Y');
+
+            // $beat_name = $invoice->beat->beat_name;
+            $distributor = Distributor::get()->first();
+
+            $invoiceTotal = round($taxableamt,0);
+
+
+            $data = compact(
+                'items', 
+                'total', 
+                'grandTotal',
+                'boxtotal',
+                'pcstotal',
+                'totalnetamt',
+                'taxableamt',
+                'invoiceTotal',
+                'customer',
+                'beat_name',
+                'distributor',
+                'request_id',
+
+            );
+        }
+        return $data;
+            
+
+        }
+         
          catch (\Exception $e) {
             $success = false;
             $message = $e->getMessage();

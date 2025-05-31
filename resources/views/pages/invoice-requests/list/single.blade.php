@@ -19,6 +19,7 @@
         {{ \Carbon\Carbon::parse($invoice->created_at)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s') }}
     </td>
     <td></td>
+    <td></td>
     <td>
         <a class="btn btn-primary" href="{{ route('invoice.request.edit', ['id' => $invoice->id]) }}"><i class="bi bi-pencil"></i></a>
         <button class="btn btn-danger" onclick="showDeleteConfirmation('{{ $invoice->id }}')"><i class="bi bi-trash"></i></button>
