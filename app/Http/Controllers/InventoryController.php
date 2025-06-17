@@ -66,7 +66,7 @@ class InventoryController extends Controller
                         'measurement_id' => (int)$record['inv_mea'],
                         'stock_out_in'   => (int)$record['inv_qty'],
                         'stock_action'  => 'add',
-                        'buying_price'  => $avg
+                        'buying_price'  => str_replace(',','',$avg)
                     ]);
 
                 }
@@ -75,7 +75,7 @@ class InventoryController extends Controller
                         'item_code'=>'',
                         'product_id' => (int)$product_id,
                         'total_stock' => $total_qty,
-                        'buying_price'  => $record['inv_buying_price']
+                        'buying_price'  => str_replace(',','',$record['inv_buying_price'])
                     ]);
                     $invtry->item_code = 'IN-'.$invtry->id;
                     $invtry->save();
@@ -85,7 +85,7 @@ class InventoryController extends Controller
                         'measurement_id' => (int)$record['inv_mea'],
                         'stock_out_in'   => (int)$record['inv_qty'],
                         'stock_action'  => 'add',
-                        'buying_price'  => $record['inv_buying_price']
+                        'buying_price'  => str_replace(',','',$record['inv_buying_price'])
                     ]);
 
                 }
