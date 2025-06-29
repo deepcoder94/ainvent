@@ -65,6 +65,11 @@ class InvoiceListController extends Controller
             $taxableamt = 0;
 
             foreach ($products as $p) {
+                
+                if (!$p->product || !$p->measurement) {
+                    \Log::warning('Missing product or measurement for InvoiceProduct ID: ' . $p->id);
+                    throw new Exception('Missing product or measurement for InvoiceProduct ID: ' . $p->id);
+                }                
                 $actualRate = $this->roundUp(($p->mrp * 100) / (100+$p->product->gst_rate));
                 $item = [
                     'qty' => $p->quantity,
