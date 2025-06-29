@@ -217,8 +217,8 @@ class InvoiceRequestController extends Controller
                     'product_id'=>$p->product_id,
                     'measurement_id'=>$p->measurement_id,
                     'qty'=>$p->quantity,
-                    'rate'=>$p->rate,
-                    'minrate'=>$min_rate
+                    'rate'=>(float) str_replace(',', '', $p->rate),
+                    'minrate'=>(float) str_replace(',', '', $min_rate),
                 ];
                 array_push($products,$prod);
             }

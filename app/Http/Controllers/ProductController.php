@@ -145,6 +145,7 @@ class ProductController extends Controller
 
         $total_stock = $products->inventory->total_stock;
         $buying_price = $products->inventory->buying_price; // Min rate
+        $buying_price = (float) str_replace(',', '', $buying_price);
 
         $measurement = $products->measurements;
         $qty = collect($measurement)->filter(function($value) use ($typeId){
